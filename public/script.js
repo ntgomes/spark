@@ -18,7 +18,7 @@ myVideo.muted = true;
 const peers = {};
 var currentPeer = null;
 
-
+var userId=null;
 
 
 
@@ -91,6 +91,7 @@ socket.on('user-disconnected', userId => {
 })
 myPeer.on('open', id => {
   console.log("Opened");
+  userId = id;
   socket.emit('join-room', ROOM_ID, id)
 });
 
@@ -192,10 +193,12 @@ function startScreenShare() {
   }
   navigator.mediaDevices.getDisplayMedia({ video: true }).then((stream) => {
       screenStream = stream;
+addVideoStream(document.createElement('video'), stream);
       let videoTrack = screenStream.getVideoTracks()[0];
       videoTrack.onended = () => {
           stopScreenSharing()
       }
+    
       if (myPeer) {
           let sender = currentPeer.peerConnection.getSenders().find(function (s) {
               return s.track.kind == videoTrack.kind;
@@ -203,7 +206,7 @@ function startScreenShare() {
           sender.replaceTrack(videoTrack)
           screenSharing = true
       }
-      console.log(screenStream)
+      console.log(screenStream);
   })
 }
 
