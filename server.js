@@ -1,29 +1,26 @@
-const express = require('express')
-const app = express()
-const cors = require('cors')
-app.use(cors())
-const server = require('http').Server(app)
+const express = require('express');
+const app = express();
+const cors = require('cors');
+app.use(cors());
+const server = require('http').Server(app);
 const io = require('socket.io')(server, {
   cors: {
-      origin: "*",
+    origin: '*',
   },
-})
+});
 // Peer Server
 var ExpressPeerServer = require('peer').ExpressPeerServer;
 var peerExpress = require('express');
 var peerApp = peerExpress();
 var peerServer = require('http').createServer(peerApp);
-var options = { debug: true }
+var options = { debug: true };
 var peerPort = 3001;
 peerApp.use('/peerjs', ExpressPeerServer(peerServer, options));
 peerServer.listen(peerPort);
-const { v4: uuidV4 } = require('uuid')
+const { v4: uuidV4 } = require('uuid');
 
-
-
-
-app.set('view engine', 'ejs')
-app.use(express.static('public'))
+app.set('view engine', 'ejs');
+app.use(express.static('public'));
 const path = require('path');
 
 var RateLimit = require('express-rate-limit');
@@ -32,18 +29,16 @@ var limiter = RateLimit({
   max: 20,
 });
 
- 
-
 app.use(limiter);
 
 app.get('/', (req, res) => {
-  res.redirect(`/${uuidV4()}`)
-})
+  res.redirect(`/${uuidV4()}`);
+});
 app.get('/:room', (req, res) => {
-  res.render('room', { roomId: req.params.room })
-})
+  res.render('room', { roomId: req.params.room });
+});
 
-io.on('connection', socket => {
+io.on('connection', (socket) => {
   socket.on('join-room', (roomId, userId) => {
     socket.join(roomId);
 
@@ -51,17 +46,14 @@ io.on('connection', socket => {
     // messages
     socket.on('message', (message) => {
       //send message to the same room
-      io.to(roomId).emit('createMessage', message)
-  }); 
+      io.to(roomId).emit('createMessage', message);
+    });
 
     socket.on('disconnect', () => {
-      socket.to(roomId).broadcast.emit('user-disconnected', userId)
-    })
-  })
-})
-
-
-
+      socket.to(roomId).emit('user-disconnected', userId);
+    });
+  });
+});
 
 
 app.get('/close', (req, res) => {
@@ -69,10 +61,4 @@ app.get('/close', (req, res) => {
   res.send('Http closed');
 });
 
-
-
-
-
-
-
-server.listen(process.env.PORT||3030)
+server.listen(process.env.PORT || 3030);
