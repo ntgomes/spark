@@ -74,12 +74,14 @@ navigator.mediaDevices
     });
   });
 
-socket.on('user-disconnected', (userId) => {
-  if (peers[userId]) peers[userId].close();
-});
-myPeer.on('open', (id) => {
-  console.log('Opened');
-  socket.emit('join-room', ROOM_ID, id);
+
+socket.on('user-disconnected', userId => {
+  if (peers[userId]) peers[userId].close()
+})
+myPeer.on('open', id => {
+  console.log("Opened");
+  userId = id;
+  socket.emit('join-room', ROOM_ID, id)
 });
 
 function connectToNewUser(userId, stream) {
