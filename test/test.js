@@ -2,7 +2,7 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const { app } = require('../server.js');
 var io = require('socket.io-client');
-const hand_gesture = require('../hand_gesture');
+const hand_gesture = require('../public/hand_gesture');
 require('mocha-sinon');
 var expect = require('chai').expect;
 
@@ -88,7 +88,7 @@ describe('Spark', () => {
     beforeEach(function (done) {
       this.sinon.stub(console, 'log');
       // Setup
-      socket = io.connect('http://localhost:3000', {
+      socket = io.connect('http://localhost:3030', {
         'reconnection delay': 0,
         'reopen delay': 0,
         'force new connection': true,
@@ -125,10 +125,6 @@ describe('Spark', () => {
       });
       it('answer emit function', function (done) {
         socket.emit('answer', 100);
-        done();
-      });
-      it('console.log', function (done) {
-        expect(console.log.calledWith('a user connected')).to.be.true;
         done();
       });
     });
@@ -170,7 +166,7 @@ describe('Closing spark server', () => {
   it('Should close server socket', (done) => {
     chai
       .request(app)
-      .get('/close')
+      .get('/server/close')
       .end((err, res) => {
         res.should.have.status(200);
         done();
