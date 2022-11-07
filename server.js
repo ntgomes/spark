@@ -56,9 +56,12 @@ io.on('connection', (socket) => {
 });
 
 
-app.get('/close', (req, res) => {
+app.get('/:room/close', (req, res) => {
   server.close();
+  peerServer.close();
   res.send('Http closed');
 });
 
 server.listen(process.env.PORT || 3030);
+
+module.exports = { app, io };

@@ -7,9 +7,9 @@
         "lint": "eslint '*.js?(x)'",
         "start": "node server.js",
         "format": "npx prettier --write \"**/*.js\"",
-        "test": "mocha",
-        "coverage": "nyc mocha",
-        "coverage_ci": "nyc mocha > cov",
+        "test": "mocha --exit",
+        "coverage": "nyc mocha --exit",
+        "coverage_ci": "nyc mocha --exit > cov",
         "help": "python3 scripts/help.py",
         "doc": "jsdoc -c jsdoc.json",
         "generate-docs": "jsdoc --configure jsdoc.json --verbose"
