@@ -21,7 +21,6 @@ const { v4: uuidV4 } = require('uuid');
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
-const path = require('path');
 
 var RateLimit = require('express-rate-limit');
 var limiter = RateLimit({
