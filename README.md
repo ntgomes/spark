@@ -4,10 +4,10 @@
 
   <a href="README.md">Overview</a>     |     <a href="INSTALL.md">Installation</a>    |       <a href="/docs/project_roadmap.md">Long Term Objectives</a>    
  
-[![Build](https://github.com/SiddarthR56/spark/actions/workflows/build.yml/badge.svg)](https://github.com/SiddarthR56/spark/actions/workflows/build.yml)
-[![Lint](https://github.com/SiddarthR56/spark/actions/workflows/lint.yml/badge.svg)](https://github.com/SiddarthR56/spark/actions/workflows/lint.yml)
-[![Test](https://github.com/SiddarthR56/spark/actions/workflows/test.yml/badge.svg)](https://github.com/SiddarthR56/spark/actions/workflows/test.yml)
-![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/SiddarthR56/c267cc7e00c619b7bd0e64cde19dad7b/raw/coverage.json)
+[![Build](https://github.com/ntgomes/spark/actions/workflows/build.yml/badge.svg)](https://github.com/ntgomes/spark/actions/workflows/build.yml)
+[![Lint](https://github.com/ntgomes/spark/actions/workflows/lint.yml/badge.svg)](https://github.com/ntgomes/spark/actions/workflows/lint.yml)
+[![Test](https://github.com/ntgomes/spark/actions/workflows/test.yml/badge.svg)](https://github.com/ntgomes/spark/actions/workflows/test.yml)
+![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/ntgomes/6867c01dee2f4d0f96d052c2b2e74ccf/raw/coverage.json)
 [![DOI](https://zenodo.org/badge/540260143.svg)](https://zenodo.org/badge/latestdoi/540260143)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
   
@@ -123,13 +123,13 @@ Visit our [results page](/docs/results.md) for more information regarding runnin
 
 Are you interested in contributing to this project? Visit [our contribution](CONTRIBUTING.md) documentation. 
   
-Need some ideas on what to contribute? Visit our [project roadmap](/docs/project_roadmap.md) to get some ideas or jump on over to our [development project board](https://github.com/users/SiddarthR56/projects/1) for specific issues we are tracking. 
+Need some ideas on what to contribute? Visit our [project roadmap](/docs/project_roadmap.md) to get some ideas or jump on over to our [development project board](https://github.com/users/ntgomes/projects/1) for specific issues we are tracking. 
 
 This project is made possible by the incredible donation of time from NC State Project Contributors and the advice/support of CSC 510 teaching staff. NC State University has made the resources for this project possible, and will continue to support CSC 510 projects for the forseeable future. 
 
 ## Help 
 
-View some common issues users have identified in our [troubleshooting guide](https://github.com/SiddarthR56/spark/blob/main/docs/troubleshooting_guide.md). We list tips and tricks for identifying where the issue may be coming from. Issue reports may be linked to this guide if you identify a bug that is a software limitation. 
+View some common issues users have identified in our [troubleshooting guide](https://github.com/ntgomes/spark/blob/main/docs/troubleshooting_guide.md). We list tips and tricks for identifying where the issue may be coming from. Issue reports may be linked to this guide if you identify a bug that is a software limitation. 
 
 You can visit our website with full descriptions of our classes and methods by opening ```index.html``` within your file explorer. Included on the website is user profiles of people who should use the software and success stories!
   

@@ -32,7 +32,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
         auth: ${{ secrets.GIST_SECRET }}
-        gistID: c267cc7e00c619b7bd0e64cde19dad7b
+        gistID: 6867c01dee2f4d0f96d052c2b2e74ccf
         filename: coverage.json
         label: Coverage
         message: ${{ env.COV }}
