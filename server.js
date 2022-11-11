@@ -54,7 +54,6 @@ io.on('connection', (socket) => {
   });
 });
 
-
 app.get('/:room/close', (req, res) => {
   server.close();
   peerServer.close();

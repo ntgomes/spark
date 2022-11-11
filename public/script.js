@@ -74,14 +74,13 @@ navigator.mediaDevices
     });
   });
 
-
-socket.on('user-disconnected', userId => {
-  if (peers[userId]) peers[userId].close()
-})
-myPeer.on('open', id => {
-  console.log("Opened");
+socket.on('user-disconnected', (userId) => {
+  if (peers[userId]) peers[userId].close();
+});
+myPeer.on('open', (id) => {
+  console.log('Opened');
   userId = id;
-  socket.emit('join-room', ROOM_ID, id)
+  socket.emit('join-room', ROOM_ID, id);
 });
 
 function connectToNewUser(userId, stream) {
@@ -94,6 +93,7 @@ function connectToNewUser(userId, stream) {
     console.log('user Joined and video added');
   });
   call.on('close', () => {
+    videoGrid.removeChild(video);
     video.remove();
   });
 
