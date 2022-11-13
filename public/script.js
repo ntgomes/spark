@@ -40,8 +40,8 @@ navigator.mediaDevices
       onFrame: async () => {
         await hands.send({ image: myVideo });
       },
-      width: 640,
-      height: 320,
+      width: myVideo.videoWidth,
+      height: myVideo.videoHeight,
     });
     camera.start();
     myPeer.on('call', (call) => {
