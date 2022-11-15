@@ -114,6 +114,29 @@ const scrollToBottom = () => {
   d.scrollTop(d.prop('scrollHeight'));
 };
 
+const toggleChat = () => {
+  const hideChat = `
+  <i class="fas fa-comment-slash"></i>
+  <span>Chat</span>
+  `;
+
+  const ShowChat = `
+  <i class="fas fa-comment"></i>
+  <span>Chat</span>
+  `;
+
+  var x = document.getElementById("chat_container");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+    document.querySelector('.main__chat_button').innerHTML = ShowChat;
+
+  } else {
+    x.style.display = "none";
+    document.querySelector('.main__chat_button').innerHTML = hideChat;
+  }
+
+}
+
 const setMuteButton = () => {
   const html = `
     <i class="fas fa-microphone"></i>
@@ -128,6 +151,24 @@ const setUnmuteButton = () => {
     <span>Unmute</span>
   `;
   document.querySelector('.main__mute_button').innerHTML = html;
+};
+
+// https://github.com/ntgomes/spark/issues/11
+const setMuteAllButton = () => {
+  const html = `
+    <i class="fas fa-microphone"></i>
+    <span>Mute all</span>
+  `;
+  document.querySelector('.main__mute_all_button').innerHTML = html;
+};
+
+
+const setUnmuteAllButton = () => {
+  const html = `
+    <i class="unmute fas fa-microphone-slash"></i>
+    <span>Unmute all</span>
+  `;
+  document.querySelector('.main__mute_all_button').innerHTML = html;
 };
 
 const setStopVideo = () => {
@@ -145,6 +186,7 @@ const setPlayVideo = () => {
   `;
   document.querySelector('.main__video_button').innerHTML = html;
 };
+
 const muteUnmute = () => {
   const enabled = myVideoStream.getAudioTracks()[0].enabled;
   if (enabled) {
@@ -155,6 +197,26 @@ const muteUnmute = () => {
     myVideoStream.getAudioTracks()[0].enabled = true;
   }
 };
+
+const muteUnmuteAll = () => {
+  // assuming 0th index is self audio and rest are from connections
+  const audioTracks = myVideoStream.getAudioTracks();
+  console.log(audioTracks);
+  // setUnmuteAllButton();
+  // setMuteAllButton();
+  // for (var i= 1; i < audioTracks.length; i++) {
+  //   var enabled = audioTracks[i].enabled;
+  //   if (enabled) {
+  //     myVideoStream.getAudioTracks()[i].enabled = false;
+  //     
+  //   } else {
+  //    
+  //     myVideoStream.getAudioTracks()[i].enabled = true;
+  //   }
+  // }
+ 
+};
+
 
 const playStop = () => {
   console.log('object');
@@ -167,6 +229,8 @@ const playStop = () => {
     myVideoStream.getVideoTracks()[0].enabled = true;
   }
 };
+
+
 var screenSharing = false;
 var screenStream;
 function startScreenShare() {
@@ -204,13 +268,23 @@ function stopScreenSharing() {
   });
   screenSharing = false;
 }
+
 document.getElementById('mute').addEventListener('click', () => {
   muteUnmute();
+});
+
+document.getElementById('muteAll').addEventListener('click', () => {
+  muteUnmuteAll();
 });
 
 document.getElementById('playStop').addEventListener('click', () => {
   playStop();
 });
+
+document.getElementById('chatButton').addEventListener('click', () => {
+  toggleChat();
+});
+
 var screenShare = document.getElementById('share-screen');
 screenShare.addEventListener('click', () => {
   if (screenSharing) {
