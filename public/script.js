@@ -14,6 +14,7 @@ const myVideo = document.createElement('video');
 myVideo.muted = true;
 const peers = {};
 var currentPeer = null;
+var gesturesEnabled = false;
 
 navigator.mediaDevices
   .getUserMedia({
@@ -38,7 +39,7 @@ navigator.mediaDevices
 
     const camera = new Camera(myVideo, {
       onFrame: async () => {
-        await hands.send({ image: myVideo });
+        if (gesturesEnabled) await hands.send({ image: myVideo });
       },
       width: myVideo.videoWidth,
       height: myVideo.videoHeight,
@@ -173,6 +174,23 @@ const setPlayVideo = () => {
   `;
   document.querySelector('.main__video_button').innerHTML = html;
 };
+
+const setEnableGestures = () => {
+  const html = `
+    <i class="far fa-hand-paper"></i>
+    <span>Enable Gestures</span>
+  `;
+  document.querySelector('.main__gestures__button').innerHTML = html;
+}
+
+const setDisableGestures = () => {
+  const html = `
+    <i class="fas fa-hand-paper"></i>
+    <span>Disable Gestures</span>
+  `;
+  document.querySelector('.main__gestures__button').innerHTML = html;
+}
+
 const muteUnmute = () => {
   const enabled = myVideoStream.getAudioTracks()[0].enabled;
   if (enabled) {
@@ -195,6 +213,17 @@ const playStop = () => {
     myVideoStream.getVideoTracks()[0].enabled = true;
   }
 };
+
+const toggleGesture = () => {
+  if (gesturesEnabled) {
+    setEnableGestures();
+    gesturesEnabled = false;
+  } else {
+    setDisableGestures();
+    gesturesEnabled = true;
+  }
+}
+
 var screenSharing = false;
 var screenStream;
 function startScreenShare() {
@@ -246,6 +275,11 @@ document.getElementById('chatButton').addEventListener('click', () => {
 
 document.getElementById('muteAll').addEventListener('click', () => {
   socket.emit('muteAllUsers');
+});
+
+document.getElementById('gestureButton').addEventListener('click', () => {
+  console.log('gesture click')
+  toggleGesture();
 });
 
 var screenShare = document.getElementById('share-screen');
