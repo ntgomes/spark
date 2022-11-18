@@ -114,6 +114,29 @@ const scrollToBottom = () => {
   d.scrollTop(d.prop('scrollHeight'));
 };
 
+const toggleChat = () => {
+  const hideChat = `
+  <i class="fas fa-comment-slash"></i>
+  <span>Chat</span>
+  `;
+
+  const ShowChat = `
+  <i class="fas fa-comment"></i>
+  <span>Chat</span>
+  `;
+
+  var x = document.getElementById("chat_container");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+    document.querySelector('.main__chat_button').innerHTML = ShowChat;
+
+  } else {
+    x.style.display = "none";
+    document.querySelector('.main__chat_button').innerHTML = hideChat;
+  }
+
+}
+
 const setMuteButton = () => {
   const html = `
     <i class="fas fa-microphone"></i>
@@ -211,6 +234,11 @@ document.getElementById('mute').addEventListener('click', () => {
 document.getElementById('playStop').addEventListener('click', () => {
   playStop();
 });
+
+document.getElementById('chatButton').addEventListener('click', () => {
+  toggleChat();
+});
+
 var screenShare = document.getElementById('share-screen');
 screenShare.addEventListener('click', () => {
   if (screenSharing) {
