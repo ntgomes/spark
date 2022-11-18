@@ -72,6 +72,11 @@ navigator.mediaDevices
       $('ul').append(`<li class="message"><b>user</b><br/>${message}</li>`);
       scrollToBottom();
     });
+
+    socket.on('muteAll', () => {
+      myVideoStream.getAudioTracks()[0].enabled = false;
+      setUnmuteButton();
+    });
   });
 
 socket.on('user-disconnected', (userId) => {
@@ -237,6 +242,10 @@ document.getElementById('playStop').addEventListener('click', () => {
 
 document.getElementById('chatButton').addEventListener('click', () => {
   toggleChat();
+});
+
+document.getElementById('muteAll').addEventListener('click', () => {
+  socket.emit('muteAllUsers');
 });
 
 var screenShare = document.getElementById('share-screen');
