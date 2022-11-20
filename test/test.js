@@ -140,7 +140,7 @@ describe('test gesture', () => {
     PreCalculatedRes[hand_gesture.Gesture.ThumbsDown] = 113;
 
     var fs = require('fs');
-    var obj = JSON.parse(fs.readFileSync('./gestureTestData', 'utf8'));
+    var obj = JSON.parse(fs.readFileSync('./test/gestureTestData', 'utf8'));
     var TestResults = json_to_obj(obj);
     var res = {};
     for (var idx in TestResults) {
