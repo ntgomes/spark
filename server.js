@@ -219,7 +219,7 @@ app.get('/:room/close', (req, res) => {
  * @param {string} [label] Label of the signal that io picks up
  * @param {function} [callback] Function that acts on a connecting socket that is called when hit
  * @event io#on
- * @listens socket#emit
+ * @listens io#connect
  */
 io.on('connection', (socket) => {
   /**

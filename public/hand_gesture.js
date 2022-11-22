@@ -12,6 +12,11 @@ var gesturesEnabled = true;
 var x1 = 0;
 var x2 = 0;
 
+/**
+ * Enum for the different types of gestures Spark recognizes.
+ * 
+ * @type {Object}
+ */
 const Gesture = Object.freeze({
   RightSwipe: 1,
   LeftSwipe: 2,
@@ -21,6 +26,13 @@ const Gesture = Object.freeze({
   NoDetection: 6,
 });
 
+/**
+ * Determines what gesture is being shown based on the given hand detection data.
+ * 
+ * @function
+ * @param {Object} results Hand detection data 
+ * @returns {Object} The gesture enum that was determined
+ */
 function onResults(results) {
   if (results.multiHandLandmarks.length != 0) {
     var [lsit, box] = findhandpos(results.multiHandLandmarks[0]);
@@ -43,8 +55,6 @@ function onResults(results) {
 
   if (lsit.length != 0) {
     var fings = detect_fingersup(lsit);
-
-    // console.log(fings);
 
     if (fings[1] == true && fings[3] == false && fings[4] == false) {
       if (start_tracking == false) {
@@ -77,9 +87,17 @@ function onResults(results) {
     }
   }
 
+  // Default to no recognizable detection
   return Gesture.NoDetection;
 }
 
+/**
+ * Helper function to determine the x-y coordinates of the positions of the hand
+ * 
+ * @function
+ * @param {Object} landmarks 
+ * @returns {Array} x-y coordinates of the hand data
+ */
 function findhandpos(landmarks) {
   var xlist = [];
   var ylist = [];
@@ -96,12 +114,19 @@ function findhandpos(landmarks) {
   var xmin = Math.min(xlist);
   var xmax = Math.max(xlist);
   var ymin = Math.min(ylist);
-  var ymax = Math.max(ylist);
+  var ymax = Math.max(ylist); // Even if unused here, it is needed for the Hands result calculation
   bbox = [xmin, ymin, xmax, xmin];
 
   return [lmlist, bbox];
 }
 
+/**
+ * Determines how many fingers are pointing "up", using arrays to store the result.
+ * 
+ * @function
+ * @param {Array} lmlist 
+ * @returns {Array} The fingers IDs that are found as "up" 
+ */
 function detect_fingersup(lmlist) {
   var fingers = [];
   var ids = [4, 8, 12, 16, 20];
@@ -120,6 +145,7 @@ function detect_fingersup(lmlist) {
   return fingers;
 }
 
+// Necessary for client-side handling and for tests
 try {
   module.exports = { onResults, Gesture };
 } catch (error) {
