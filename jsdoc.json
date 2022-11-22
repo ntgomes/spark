@@ -1,6 +1,6 @@
 {
     "source": {
-      "include": ["./client.js", "./server.js"],
+      "include": ["./public/script.js", "./public/hand_gesture.js", "./server.js"],
       "excludePattern": "(node_modules/|docs)"
     },
     "plugins": ["plugins/markdown"],
