@@ -17,6 +17,7 @@ jobs:
         with:
           output_dir: ./out
           config_file: jsdoc.json
+          template: clean-jsdoc-theme
           front_page: JSDOC_HOME.md
 
       - name: Deploy
