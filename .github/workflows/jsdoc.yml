@@ -2,8 +2,7 @@ name: Generate docs for GitHub Pages
 
 on:
   push:
-    branches-ignore:
-      - gh-pages
+    branches: [ "main" ]
 
 jobs:
   deploy:
