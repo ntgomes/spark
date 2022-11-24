@@ -201,7 +201,10 @@ app.get('/', (req, res) => {
  */
 app.get('/:room', (req, res) => {
   res.render('room', { roomId: req.params.room });
-  room_participants_map[req.params.room] = [];
+  if (!room_hosts_map[req.params.room]) {
+    room_participants_map[req.params.room] = [];
+    room_hosts_map[req.params.room] = null;
+  }
 });
 
 /**
@@ -239,11 +242,9 @@ io.on('connection', (socket) => {
     // first guy who joins the room should be host, keep counter for the room
 
     room_participants_map[roomId].push(userId);
-    if (room_participants_map[roomId].length === 1) {
+    if (room_hosts_map[roomId] === null) {
       room_hosts_map[roomId] = userId;
     }
-    console.log('room_participants_map:', room_participants_map);
-    console.log('room_hosts_map:', room_hosts_map);
     // Broadcast to all existing clients in the room that a user has connected
     socket.to(roomId).emit('user-connected', userId);
 
@@ -266,8 +267,11 @@ io.on('connection', (socket) => {
      * @param {function} [callback] Function that acts on a connecting socket that is called when hit
      * @listens socket#emit
      */
-    socket.on('muteAllUsers', () => {
-      io.to(roomId).emit('muteAll');
+    socket.on('muteAllUsers', (userId, roomId) => {
+      if (room_hosts_map[roomId].includes(userId)) {
+        console.log('User is host');
+        io.to(roomId).emit('muteAll', userId);
+      }
     });
 
     /**
