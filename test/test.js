@@ -1,7 +1,7 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const { app } = require('../server.js');
-var io = require('socket.io-client');
+var ioClient = require('socket.io-client');
 const hand_gesture = require('../public/hand_gesture');
 require('mocha-sinon');
 var expect = require('chai').expect;
@@ -88,7 +88,7 @@ describe('Spark', () => {
     beforeEach(function (done) {
       this.sinon.stub(console, 'log');
       // Setup
-      socket = io.connect('http://localhost:3030', {
+      socket = ioClient.connect('http://localhost:3030', {
         'reconnection delay': 0,
         'reopen delay': 0,
         'force new connection': true,
@@ -107,23 +107,23 @@ describe('Spark', () => {
     });
 
     describe('Socket emit methods ', function () {
-      it('create or join emit function', function (done) {
-        socket.emit('create or join', 100);
+      it('join-room emit function', function (done) {
+        socket.emit('join-room', 100, 'abc');
         done();
       });
-      it('ready emit function', function (done) {
-        socket.emit('ready', 100);
+      it('user-connected emit function', function (done) {
+        socket.emit('user-connected', 100);
         done();
       });
-      it('candidate emit function', function (done) {
-        socket.emit('candidate', 100);
+      it('message emit function', function (done) {
+        socket.emit('message', 100);
         done();
       });
-      it('offer emit function', function (done) {
-        socket.emit('offer', 100);
+      it('muteAllUsers emit function', function (done) {
+        socket.emit('muteAllUsers', 100);
         done();
       });
-      it('answer emit function', function (done) {
+      it('disconnect emit function', function (done) {
         socket.emit('answer', 100);
         done();
       });
