@@ -134,6 +134,7 @@ const limiter = RateLimit({
   max: 20,
 });
 
+// variables to keep track of room hosts and participants
 var roomHostsMap = {};
 var roomParticipantsMap = {};
 
@@ -201,6 +202,8 @@ app.get('/', (req, res) => {
  */
 app.get('/:room', (req, res) => {
   res.render('room', { roomId: req.params.room });
+
+  // Initialize the creation of roomParticipantsMap and roomHostsMap
   if (!roomHostsMap[req.params.room]) {
     roomParticipantsMap[req.params.room] = [];
     roomHostsMap[req.params.room] = null;
@@ -239,9 +242,11 @@ io.on('connection', (socket) => {
    */
   socket.on('join-room', (roomId, userId) => {
     socket.join(roomId);
-    // first guy who joins the room should be host, keep counter for the room
 
+    // Add anyone who joins the room to the roomParticipantsMap
     roomParticipantsMap[roomId].push(userId);
+
+    // first person to join the room is assumed to be the host
     if (roomHostsMap[roomId] === null) {
       roomHostsMap[roomId] = userId;
     }
@@ -268,6 +273,7 @@ io.on('connection', (socket) => {
      * @listens socket#emit
      */
     socket.on('muteAllUsers', (userId, roomId) => {
+      // check if
       if (roomHostsMap[roomId].includes(userId)) {
         io.to(roomId).emit('muteAll', userId);
       }
@@ -283,8 +289,11 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
       socket.to(roomId).emit('user-disconnected', userId);
 
+      // remove participant from the room's map
       const index = roomParticipantsMap[roomId].indexOf(userId);
       roomParticipantsMap[roomId].splice(index, 1);
+
+      // if the user is host, then assign a random person in the participants as the host
       if (roomParticipantsMap[roomId].length > 0 && roomHostsMap[roomId].includes(userId)) {
         const randomElement =
           roomParticipantsMap[roomId][Math.floor(Math.random() * roomParticipantsMap[roomId].length)];
