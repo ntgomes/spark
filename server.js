@@ -134,8 +134,17 @@ const limiter = RateLimit({
   max: 20,
 });
 
-// variables to keep track of room hosts and participants
+/** 
+ * Variable to keep track of room hosts for determining host-only actions
+ * 
+ * @type {Object}
+ */
 var roomHostsMap = {};
+/** 
+ * Variable to keep track of room participants for determining host-only actions
+ * 
+ * @type {Object}
+ */
 var roomParticipantsMap = {};
 
 /**
@@ -240,13 +249,21 @@ io.on('connection', (socket) => {
    * @param {function} [callback] Function that acts on a connecting socket that is called when hit
    * @listens socket#emit
    */
-  socket.on('join-room', (roomId, userId) => {
+  socket.on('join-room', /* istanbul ignore next */ (roomId, userId) => {
+    /*
+     * Note: This entire callback function will be ignored by nyc for purposes of unit testing
+     * and coverage, since nyc can't keep track of the server-side functions given by the
+     * socket.io server, and can only keep track of the client-side functions of the socket
+     * defined in the tests.
+     */
+
+    // Make the socket join a channel under roomId that the io server will broadcast messages to
     socket.join(roomId);
 
     // Add anyone who joins the room to the roomParticipantsMap
     roomParticipantsMap[roomId].push(userId);
 
-    // first person to join the room is assumed to be the host
+    // First person to join the room is assumed to be the host
     if (roomHostsMap[roomId] === null) {
       roomHostsMap[roomId] = userId;
     }
