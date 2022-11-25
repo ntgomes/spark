@@ -1,7 +1,7 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const { app } = require('../server.js');
-var ioClient = require('socket.io-client');
+var io = require('socket.io-client');
 const hand_gesture = require('../public/hand_gesture');
 require('mocha-sinon');
 var expect = require('chai').expect;
@@ -88,7 +88,7 @@ describe('Spark', () => {
     beforeEach(function (done) {
       this.sinon.stub(console, 'log');
       // Setup
-      socket = ioClient.connect('http://localhost:3030', {
+      socket = io.connect('http://localhost:3030', {
         'reconnection delay': 0,
         'reopen delay': 0,
         'force new connection': true,
@@ -108,7 +108,7 @@ describe('Spark', () => {
 
     describe('Socket emit methods ', function () {
       it('join-room emit function', function (done) {
-        socket.emit('join-room', 100, 'abc');
+        socket.emit('join-room', 100);
         done();
       });
       it('user-connected emit function', function (done) {
