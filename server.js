@@ -134,8 +134,8 @@ const limiter = RateLimit({
   max: 20,
 });
 
-var room_hosts_map = {};
-var room_participants_map = {};
+var roomHostsMap = {};
+var roomParticipantsMap = {};
 
 /**
  * Sets various configs for the express app; in the context of Spark, it's only used to set
@@ -201,9 +201,9 @@ app.get('/', (req, res) => {
  */
 app.get('/:room', (req, res) => {
   res.render('room', { roomId: req.params.room });
-  if (!room_hosts_map[req.params.room]) {
-    room_participants_map[req.params.room] = [];
-    room_hosts_map[req.params.room] = null;
+  if (!roomHostsMap[req.params.room]) {
+    roomParticipantsMap[req.params.room] = [];
+    roomHostsMap[req.params.room] = null;
   }
 });
 
@@ -241,9 +241,9 @@ io.on('connection', (socket) => {
     socket.join(roomId);
     // first guy who joins the room should be host, keep counter for the room
 
-    room_participants_map[roomId].push(userId);
-    if (room_hosts_map[roomId] === null) {
-      room_hosts_map[roomId] = userId;
+    roomParticipantsMap[roomId].push(userId);
+    if (roomHostsMap[roomId] === null) {
+      roomHostsMap[roomId] = userId;
     }
     // Broadcast to all existing clients in the room that a user has connected
     socket.to(roomId).emit('user-connected', userId);
@@ -268,8 +268,7 @@ io.on('connection', (socket) => {
      * @listens socket#emit
      */
     socket.on('muteAllUsers', (userId, roomId) => {
-      if (room_hosts_map[roomId].includes(userId)) {
-        console.log('User is host');
+      if (roomHostsMap[roomId].includes(userId)) {
         io.to(roomId).emit('muteAll', userId);
       }
     });
@@ -284,12 +283,12 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
       socket.to(roomId).emit('user-disconnected', userId);
 
-      const index = room_participants_map[roomId].indexOf(userId);
-      room_participants_map[roomId].splice(index, 1);
-      if (room_participants_map[roomId].length > 0 && room_hosts_map[roomId].includes(userId)) {
+      const index = roomParticipantsMap[roomId].indexOf(userId);
+      roomParticipantsMap[roomId].splice(index, 1);
+      if (roomParticipantsMap[roomId].length > 0 && roomHostsMap[roomId].includes(userId)) {
         const randomElement =
-          room_participants_map[roomId][Math.floor(Math.random() * room_participants_map[roomId].length)];
-        room_hosts_map[roomId] = randomElement;
+          roomParticipantsMap[roomId][Math.floor(Math.random() * roomParticipantsMap[roomId].length)];
+        roomHostsMap[roomId] = randomElement;
       }
     });
   });
