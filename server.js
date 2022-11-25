@@ -283,6 +283,14 @@ io.on('connection', (socket) => {
      */
     socket.on('disconnect', () => {
       socket.to(roomId).emit('user-disconnected', userId);
+
+      const index = room_participants_map[roomId].indexOf(userId);
+      room_participants_map[roomId].splice(index, 1);
+      if (room_participants_map[roomId].length > 0 && room_hosts_map[roomId].includes(userId)) {
+        const randomElement =
+          room_participants_map[roomId][Math.floor(Math.random() * room_participants_map[roomId].length)];
+        room_hosts_map[roomId] = randomElement;
+      }
     });
   });
 });
