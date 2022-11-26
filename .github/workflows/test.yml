@@ -24,9 +24,7 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: npm run test
-      continue-on-error: true
     - run: npm run coverage_ci
-      continue-on-error: true
     - run: echo "COV=$(python3 scripts/cov_parser.py ./cov)" >> $GITHUB_ENV
     - name: create_badge
       uses: schneegans/dynamic-badges-action@v1.4.0    
