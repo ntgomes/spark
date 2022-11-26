@@ -107,23 +107,23 @@ describe('Spark', () => {
     });
 
     describe('Socket emit methods ', function () {
-      it('create or join emit function', function (done) {
-        socket.emit('create or join', 100);
+      it('join-room emit function', function (done) {
+        socket.emit('join-room', 100);
         done();
       });
-      it('ready emit function', function (done) {
-        socket.emit('ready', 100);
+      it('user-connected emit function', function (done) {
+        socket.emit('user-connected', 100);
         done();
       });
-      it('candidate emit function', function (done) {
-        socket.emit('candidate', 100);
+      it('message emit function', function (done) {
+        socket.emit('message', 100);
         done();
       });
-      it('offer emit function', function (done) {
-        socket.emit('offer', 100);
+      it('muteAllUsers emit function', function (done) {
+        socket.emit('muteAllUsers', 100);
         done();
       });
-      it('answer emit function', function (done) {
+      it('disconnect emit function', function (done) {
         socket.emit('answer', 100);
         done();
       });
