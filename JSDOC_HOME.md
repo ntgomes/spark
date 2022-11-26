@@ -4,7 +4,7 @@
   We have the best hands free solution to your presentation needs! Have you ever presented to an audience and not had the ability to interact and change your meeting controls on the go? Spark is a solution to use gestures to change your volume and screen sharing settings while you present. With just a press of a button, just give your camera a gesture and keep on presenting. It will be sure to <i>spark</i> new conversations and be the most seemless, hands-free presentation you have had!
 </p>
 <h1 align="center"> 
-  <video src="https://user-images.githubusercontent.com/99683342/194715093-3fbc1bc9-7690-4edb-b8bb-5594ba029bb7.mp4" width="600"></video>
+  <video src="https://user-images.githubusercontent.com/99683342/194715093-3fbc1bc9-7690-4edb-b8bb-5594ba029bb7.mp4" width="600" controls></video>
 </h1>
 
 <p>
