@@ -4,7 +4,6 @@ const { app } = require('../server.js');
 var io = require('socket.io-client');
 const hand_gesture = require('../public/hand_gesture');
 require('mocha-sinon');
-var expect = require('chai').expect;
 
 // Configure chai
 chai.use(chaiHttp);
@@ -107,23 +106,23 @@ describe('Spark', () => {
     });
 
     describe('Socket emit methods ', function () {
-      it('join-room emit function', function (done) {
-        socket.emit('join-room', 100);
+      it('create or join emit function', function (done) {
+        socket.emit('create or join', 100);
         done();
       });
-      it('user-connected emit function', function (done) {
-        socket.emit('user-connected', 100);
+      it('ready emit function', function (done) {
+        socket.emit('ready', 100);
         done();
       });
-      it('message emit function', function (done) {
-        socket.emit('message', 100);
+      it('candidate emit function', function (done) {
+        socket.emit('candidate', 100);
         done();
       });
-      it('muteAllUsers emit function', function (done) {
-        socket.emit('muteAllUsers', 100);
+      it('offer emit function', function (done) {
+        socket.emit('offer', 100);
         done();
       });
-      it('disconnect emit function', function (done) {
+      it('answer emit function', function (done) {
         socket.emit('answer', 100);
         done();
       });
