@@ -10,7 +10,7 @@
         "test": "mocha --exit",
         "coverage": "nyc mocha --exit",
         "coverage_ci": "nyc mocha --exit > cov",
-        "help": "python3 scripts/help.py",
+        "help": "node scripts/help.py",
         "doc": "jsdoc -c jsdoc.json -R ./JSDOC_HOME.md",
         "generate-docs": "jsdoc --configure jsdoc.json --readme ./JSDOC_HOME.md --verbose"
     },
