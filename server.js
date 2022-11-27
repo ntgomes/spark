@@ -84,110 +84,42 @@ const io = require('socket.io')(server, {
  */
 const ExpressPeerServer = require('peer').ExpressPeerServer;
 
-/**
- * The app instance for managing new multi-peer connections from clients using rooms.
- * Requires no params for instantiation in the context of the server
- * and its default settings.
- *
- * @const
- * @type {Object}
- * @constructor
- * @fires peerApp#use
- */
+
 const peerApp = express();
 
-/**
- * The HTTP server module used for starting Spark's server to listen for new peers and their activity; uses createServer
- * to set up the peer.js functionality.
- *
- * @type {Object}
- * @param {Object} [peerApp] Reference to instantiated peer.js express app that server module can interface on
- * @const
- * @method
- *
- * @listens peerServer#listen
- */
+
 const peerServer = require('http').createServer(peerApp);
 
-/**
- * Module for generating UUIDs, using v4 specifically to generate securely.
- *
- * @const
- */
+
 const { v4: uuidV4 } = require('uuid');
 
-/**
- * Module for enforcing rate limit on an express app
- *
- * @const
- */
+
 const RateLimit = require('express-rate-limit');
 
-/**
- * Sets up the rate limit rules to be used for the express app
- *
- * @constructor
- * @param {Object} [configs] Settings used for the rate limiting rules
- */
+
 const limiter = RateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
   max: 20,
 });
 
-/** 
- * Variable to keep track of room hosts for determining host-only actions
- * 
- * @type {Object}
- */
+
 var roomHostsMap = {};
-/** 
- * Variable to keep track of room participants for determining host-only actions
- * 
- * @type {Object}
- */
+
 var roomParticipantsMap = {};
 
-/**
- * Sets various configs for the express app; in the context of Spark, it's only used to set
- * the view engine from HTML to EJS files.
- *
- * @event app#set
- */
+
 app.set('view engine', 'ejs');
-/**
- * Applies CORS for all requests.
- *
- * @event app#use
- */
+
 app.use(cors());
-/**
- * Tells the express app to reference any static files to serve under the
- * project's public directory.
- *
- * @event app#use
- */
+
 app.use(express.static('public'));
-/**
- * Tells the express app to reference the instantiated rate limiter rules.
- *
- * @event app#use
- */
+
 app.use(limiter);
 
-/**
- * Sets up a route to listen to peer connections with debug options.
- *
- * @event peerApp#use
- */
+
 peerApp.use(
   '/peerjs',
-  /**
-   * Server functionality that interfaces on the provided HTTP server to provide peer.js functionality.
-   *
-   * @constructor
-   * @param {Object} [peerServer] Reference to the HTTP server that will be used to interface peer.js functionality
-   * @param {Object} [configs] Object that represents settings for the server
-   */
+ 
   ExpressPeerServer(peerServer, { debug: true })
 );
 
@@ -219,44 +151,18 @@ app.get('/:room', (req, res) => {
   }
 });
 
-/**
- * GET /:room/close : Route that shuts down the server when hit
- *
- * @event app#get
- * @param {string} [path] The path for which the GET will act on, parametrized with :
- * @param {function} [callback] The function with request and response pair that runs when the endpoint is hit
- */
+
 app.get('/:room/close', (req, res) => {
   server.close();
   peerServer.close();
   res.send('Http closed');
 });
 
-/**
- * Handles setting up initial server-side functions for new socket.io connections that it picks up.
- *
- * @method
- * @param {string} [label] Label of the signal that io picks up
- * @param {function} [callback] Function that acts on a connecting socket that is called when hit
- * @event io#on
- * @listens io#connect
- */
-io.on('connection', (socket) => {
-  /**
-   * Handles when a client socket calls join-room.
-   *
-   * @param {string} [label] Label of the signal that io picks up
-   * @param {function} [callback] Function that acts on a connecting socket that is called when hit
-   * @listens socket#emit
-   */
-  socket.on('join-room', /* istanbul ignore next */ (roomId, userId) => {
-    /*
-     * Note: This entire callback function will be ignored by nyc for purposes of unit testing
-     * and coverage, since nyc can't keep track of the server-side functions given by the
-     * socket.io server, and can only keep track of the client-side functions of the socket
-     * defined in the tests.
-     */
 
+io.on('connection', (socket) => {
+  
+  socket.on('join-room', /* istanbul ignore next */ (roomId, userId) => {
+   
     // Make the socket join a channel under roomId that the io server will broadcast messages to
     socket.join(roomId);
 
@@ -270,25 +176,16 @@ io.on('connection', (socket) => {
     // Broadcast to all existing clients in the room that a user has connected
     socket.to(roomId).emit('user-connected', userId);
 
-    /**
-     * Handles when a client socket sends a text message signal.
-     *
-     * @param {string} [label] Label of the signal that io picks up
-     * @param {function} [callback] Function that acts on a connecting socket that is called when hit
-     * @listens socket#emit
-     */
+  
     socket.on('message', (message) => {
       // Send message to the same room
       io.to(roomId).emit('createMessage', message);
     });
 
-    /**
-     * Handles when a client socket sends a mute-all signal.
-     *
-     * @param {string} [label] Label of the signal that io picks up
-     * @param {function} [callback] Function that acts on a connecting socket that is called when hit
-     * @listens socket#emit
-     */
+   socket.on('filetransfer',(blob)=>{
+io.to(roomId).emit('downloadFile',blob);
+
+   });
     socket.on('muteAllUsers', (userId, roomId) => {
       // check if
       if (roomHostsMap[roomId].includes(userId)) {
@@ -296,13 +193,7 @@ io.on('connection', (socket) => {
       }
     });
 
-    /**
-     * Handles when a client socket sends a disconnect signal.
-     *
-     * @param {string} [label] Label of the signal that io picks up
-     * @param {function} [callback] Function that acts on a connecting socket that is called when hit
-     * @listens socket#emit
-     */
+    
     socket.on('disconnect', () => {
       socket.to(roomId).emit('user-disconnected', userId);
 
@@ -320,22 +211,10 @@ io.on('connection', (socket) => {
   });
 });
 
-/**
- * Makes the app server listen to requests to the given port
- *
- * @method
- * @param {number} [port] The port number to listen to requests from
- * @event server#listen
- */
+
 server.listen(process.env.PORT || 3030);
-/**
- * Makes the peer server listen to requests to the given port
- *
- * @method
- * @param {number} [port] The port number to listen to requests from
- * @event peerServer#listen
- */
+
 peerServer.listen(process.env.PEER_PORT || 3001);
 
-/* Needed for testing purposes */
+
 module.exports = { app, io };
