@@ -14,7 +14,7 @@ var x2 = 0;
 
 /**
  * Enum for the different types of gestures Spark recognizes.
- * 
+ *
  * @type {Object}
  */
 const Gesture = Object.freeze({
@@ -28,9 +28,9 @@ const Gesture = Object.freeze({
 
 /**
  * Determines what gesture is being shown based on the given hand detection data.
- * 
+ *
  * @function
- * @param {Object} results Hand detection data 
+ * @param {Object} results Hand detection data
  * @returns {Object} The gesture enum that was determined
  */
 function onResults(results) {
@@ -93,9 +93,9 @@ function onResults(results) {
 
 /**
  * Helper function to determine the x-y coordinates of the positions of the hand
- * 
+ *
  * @function
- * @param {Object} landmarks 
+ * @param {Object} landmarks
  * @returns {Array} x-y coordinates of the hand data
  */
 function findhandpos(landmarks) {
@@ -122,10 +122,10 @@ function findhandpos(landmarks) {
 
 /**
  * Determines how many fingers are pointing "up", using arrays to store the result.
- * 
+ *
  * @function
- * @param {Array} lmlist 
- * @returns {Array} The fingers IDs that are found as "up" 
+ * @param {Array} lmlist
+ * @returns {Array} The fingers IDs that are found as "up"
  */
 function detect_fingersup(lmlist) {
   var fingers = [];
