@@ -135,15 +135,15 @@ const limiter = RateLimit({
   max: 20,
 });
 
-/** 
+/**
  * Variable to keep track of room hosts for determining host-only actions
- * 
+ *
  * @type {Object}
  */
 var roomHostsMap = {};
-/** 
+/**
  * Variable to keep track of room participants for determining host-only actions
- * 
+ *
  * @type {Object}
  */
 var roomParticipantsMap = {};
@@ -179,10 +179,9 @@ app.use(limiter);
  *
  * @event peerApp#use
  */
-
 peerApp.use(
   '/peerjs',
- 
+
   ExpressPeerServer(peerServer, { debug: true })
 );
 
@@ -220,7 +219,6 @@ app.get('/:room', (req, res) => {
  * @param {string} [path] The path for which the GET will act on, parametrized with :
  * @param {function} [callback] The function with request and response pair that runs when the endpoint is hit
  */
- 
 
 app.get('/:room/close', (req, res) => {
   server.close();
@@ -245,79 +243,88 @@ io.on('connection', (socket) => {
    * @param {function} [callback] Function that acts on a connecting socket that is called when hit
    * @listens socket#emit
    */
-  socket.on('join-room', /* istanbul ignore next */ (roomId, userId) => {
-   /*
-     * Note: This entire callback function will be ignored by nyc for purposes of unit testing
-     * and coverage, since nyc can't keep track of the server-side functions given by the
-     * socket.io server, and can only keep track of the client-side functions of the socket
-     * defined in the tests.
-     */
+  socket.on(
+    'join-room',
+    /* istanbul ignore next */ (roomId, userId) => {
+      /*
+       * Note: This entire callback function will be ignored by nyc for purposes of unit testing
+       * and coverage, since nyc can't keep track of the server-side functions given by the
+       * socket.io server, and can only keep track of the client-side functions of the socket
+       * defined in the tests.
+       */
 
-    // Make the socket join a channel under roomId that the io server will broadcast messages to
-    socket.join(roomId);
+      // Make the socket join a channel under roomId that the io server will broadcast messages to
+      socket.join(roomId);
 
-    // Add anyone who joins the room to the roomParticipantsMap
-    roomParticipantsMap[roomId].push(userId);
+      // Add anyone who joins the room to the roomParticipantsMap
+      roomParticipantsMap[roomId].push(userId);
 
-    // First person to join the room is assumed to be the host
-    if (roomHostsMap[roomId] === null) {
-      roomHostsMap[roomId] = userId;
+      // First person to join the room is assumed to be the host
+      if (roomHostsMap[roomId] === null) {
+        roomHostsMap[roomId] = userId;
+      }
+      // Broadcast to all existing clients in the room that a user has connected
+      socket.to(roomId).emit('user-connected', userId);
+
+      /**
+       * Handles when a client socket sends a message signal.
+       *
+       * @param {string} [label] Label of the signal that io picks up
+       * @param {function} [callback] Function that acts on a connecting socket that is called when hit
+       * @listens socket#emit
+       */
+
+      socket.on('message', (message) => {
+        // Send message to the same room
+        io.to(roomId).emit('createMessage', message);
+      });
+      /**
+       * Handles when a client socket sends a filetransfer signal.
+       *
+       * @param {string} [label] Label of the signal that io picks up
+       * @param {function} [callback] Function that acts on a connecting socket that is called when hit
+       * @listens socket#emit
+       */
+      socket.on('filetransfer', (blob) => {
+        io.to(roomId).emit('downloadFile', blob);
+      });
+      /**
+       * Handles when a client socket sends a mute-all signal.
+       *
+       * @param {string} [label] Label of the signal that io picks up
+       * @param {function} [callback] Function that acts on a connecting socket that is called when hit
+       * @listens socket#emit
+       */
+      socket.on('muteAllUsers', (userId, roomId) => {
+        // Check if the provided userId is the ID of a host, and if it is, broadcast the muteAll
+        if (roomHostsMap[roomId].includes(userId)) {
+          io.to(roomId).emit('muteAll', userId);
+        }
+      });
+      /**
+       * Handles when a client socket sends a disconnect signal.
+       *
+       * @param {string} [label] Label of the signal that io picks up
+       * @param {function} [callback] Function that acts on a connecting socket that is called when hit
+       * @listens socket#emit
+       */
+
+      socket.on('disconnect', () => {
+        socket.to(roomId).emit('user-disconnected', userId);
+
+        // remove participant from the room's map
+        const index = roomParticipantsMap[roomId].indexOf(userId);
+        roomParticipantsMap[roomId].splice(index, 1);
+
+        // if the user is host, then assign a random person in the participants as the host
+        if (roomParticipantsMap[roomId].length > 0 && roomHostsMap[roomId].includes(userId)) {
+          const randomElement =
+            roomParticipantsMap[roomId][Math.floor(Math.random() * roomParticipantsMap[roomId].length)];
+          roomHostsMap[roomId] = randomElement;
+        }
+      });
     }
-    // Broadcast to all existing clients in the room that a user has connected
-    socket.to(roomId).emit('user-connected', userId);
-
-    /**
-     * Handles when a client socket sends a text message signal.
-     *
-     * @param {string} [label] Label of the signal that io picks up
-     * @param {function} [callback] Function that acts on a connecting socket that is called when hit
-     * @listens socket#emit
-     */
-  
-    socket.on('message', (message) => {
-      // Send message to the same room
-      io.to(roomId).emit('createMessage', message);
-    });
-/**
-     * Handles when a client socket sends a mute-all signal.
-     *
-     * @param {string} [label] Label of the signal that io picks up
-     * @param {function} [callback] Function that acts on a connecting socket that is called when hit
-     * @listens socket#emit
-     */
-   socket.on('filetransfer',(blob)=>{
-io.to(roomId).emit('downloadFile',blob);
-
-   });
-    socket.on('muteAllUsers', (userId, roomId) => {
-      // check if
-      if (roomHostsMap[roomId].includes(userId)) {
-        io.to(roomId).emit('muteAll', userId);
-      }
-    });
-/**
-     * Handles when a client socket sends a disconnect signal.
-     *
-     * @param {string} [label] Label of the signal that io picks up
-     * @param {function} [callback] Function that acts on a connecting socket that is called when hit
-     * @listens socket#emit
-     */
-    
-    socket.on('disconnect', () => {
-      socket.to(roomId).emit('user-disconnected', userId);
-
-      // remove participant from the room's map
-      const index = roomParticipantsMap[roomId].indexOf(userId);
-      roomParticipantsMap[roomId].splice(index, 1);
-
-      // if the user is host, then assign a random person in the participants as the host
-      if (roomParticipantsMap[roomId].length > 0 && roomHostsMap[roomId].includes(userId)) {
-        const randomElement =
-          roomParticipantsMap[roomId][Math.floor(Math.random() * roomParticipantsMap[roomId].length)];
-        roomHostsMap[roomId] = randomElement;
-      }
-    });
-  });
+  );
 });
 
 /**
@@ -338,5 +345,4 @@ server.listen(process.env.PORT || 3030);
 peerServer.listen(process.env.PEER_PORT || 3001);
 
 /* Needed for testing purposes */
-
 module.exports = { app, io };

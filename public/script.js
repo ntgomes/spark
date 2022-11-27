@@ -79,10 +79,12 @@ myVideo.muted = true;
  *
  * @const
  */
-
 const peers = {};
-
-
+/**
+ * Reference to the most recently connected peer.
+ *
+ * @type {Object}
+ */
 var currentPeer = null;
 
 /**
@@ -103,7 +105,6 @@ navigator.mediaDevices
     myVideoStream = stream; // Saves the stream that was permitted to use to the local stream ref
     addVideoStream(myVideo, stream); // Adds the local video object to the video grid
 
-    
     const hands = new Hands({
       locateFile: (file) => {
         return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
@@ -263,33 +264,44 @@ function connectToNewUser(userId, stream) {
   peers[userId] = call;
 }
 
-
-document.getElementById('filetransfer').onchange = function(event) {
-  var files = event.target.files
-   var filename = files[0].name
-   var extension = files[0].type
+/**
+ * Sends the 'filetransfer' signal to the server along with the byte data
+ * of the file that was chosen to be submitted by the user.
+ *
+ * @function
+ * @param {Object} event The event object that holds the file data to transfer
+ */
+document.getElementById('filetransfer').onchange = function (event) {
+  var files = event.target.files;
+  var filename = files[0].name;
+  var extension = files[0].type;
 
   const blob = new Blob(event.target.files);
   var file = {
-    "filename":filename,
-    "extension":extension,
-    "blob":blob
+    filename: filename,
+    extension: extension,
+    blob: blob,
   };
-  socket.emit('filetransfer',file);
-}
+  socket.emit('filetransfer', file);
+};
 
-socket.on('downloadFile',(blob)=>{
-  console.log(
-   blob
+/**
+ * Handles what happens when 'downloadFile' is recieved from server.
+ * Uses DOM manipulation that will trigger the browser to download
+ * the recieved blob.
+ *
+ * @event socket#on
+ */
+socket.on('downloadFile', (blob) => {
+  var blobUrl = URL.createObjectURL(
+    new Blob([new Uint8Array(blob.blob).buffer], {
+      type: blob.extension,
+    })
   );
 
-  var blobUrl = URL.createObjectURL(new Blob([new Uint8Array(blob.blob).buffer],{
-    "type":blob.extension
-  }));
-
   // Create a link element
-  var link = document.createElement("a");
-  var li=document.createElement("li");
+  var link = document.createElement('a');
+  var li = document.createElement('li');
 
   // Set link's href to point to the Blob URL
   link.href = blobUrl;
@@ -297,14 +309,9 @@ socket.on('downloadFile',(blob)=>{
   li.append(link);
   $('ul').append(li);
 
-      scrollToBottom();
-      link.click();
-  
-
+  scrollToBottom();
+  link.click();
 });
-
-
-
 
 /**
  * Adds a new video to the client's video grid, and forcing the stream of the video to play.
@@ -313,7 +320,6 @@ socket.on('downloadFile',(blob)=>{
  * @param {Object} video
  * @param {Object} stream
  */
-
 function addVideoStream(video, stream) {
   console.log('Video adding');
   video.srcObject = stream;
@@ -640,4 +646,3 @@ function onGestureAction(results) {
     }
   }
 }
-
