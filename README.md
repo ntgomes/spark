@@ -7,7 +7,7 @@
 [![Build](https://github.com/ntgomes/spark/actions/workflows/build.yml/badge.svg)](https://github.com/ntgomes/spark/actions/workflows/build.yml)
 [![Lint](https://github.com/ntgomes/spark/actions/workflows/lint.yml/badge.svg)](https://github.com/ntgomes/spark/actions/workflows/lint.yml)
 [![Test](https://github.com/ntgomes/spark/actions/workflows/test.yml/badge.svg)](https://github.com/ntgomes/spark/actions/workflows/test.yml)
-![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/ntgomes/6867c01dee2f4d0f96d052c2b2e74ccf/raw/coverage.json)
+[![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/ntgomes/6867c01dee2f4d0f96d052c2b2e74ccf/raw/coverage.json)](https://github.com/ntgomes/spark/blob/main/docs/results.md#code-coverage)
 [![DOI](https://zenodo.org/badge/540260143.svg)](https://zenodo.org/badge/latestdoi/540260143)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
   
@@ -63,67 +63,13 @@ Visit our [results page](/docs/results.md) for more information regarding runnin
 
 ## Directory Structure 
 
-```
-.
-|   .eslintrc.json
-|   .gitignore
-|   CITATION.cff
-|   CODE_OF_CONDUCT.md
-|   CONTRIBUTING.md
-|   LICENSE
-|   INSTALL.md
-|   README.md
-|   package.json
-|   package-lock.json
-|   server.js 
-|   client.js
-|   hand_gesture.js
-|   webrtcpage.html
-|   
-+---.github
-|   \---workflows
-|           build.yml
-|           test.yml
-|           lint.yml
-|           codeql-analysis.yml
-|   \---ISSUE_TEMPLATE
-|           bug_report.md
-|           feature_request.md
-|      
-+---static
-|   \---css
-|       | style.css
-|
-+---scripts
-|   cov_parser.py
-|   help.py
-|      
-+---docs
-|   |   filetree.txt
-|   |   project_roadmap.md
-|   |   proj1rubric.md
-|   |   proj1rubricComments.pdf
-|   |   troubleshooting_guide.md
-|   |   results.md
-|   |   spark_demo.mp4
-|   \---documentation_photos
-|           *lots of photos listed not shown here*
-|   
-+---out 
-|   |   index.html
-|   \---fonts
-|   \---scripts 
-|   \---styles
-|                    
-\---test
-    |   test.js
-```
+Visit our [file tree structure](/docs/filetree.txt) for more information on how Spark's codebase is structured.
 
 ## Contributing
 
 Are you interested in contributing to this project? Visit [our contribution](CONTRIBUTING.md) documentation. 
   
-Need some ideas on what to contribute? Visit our [project roadmap](/docs/project_roadmap.md) to get some ideas or jump on over to our [development project board](https://github.com/users/ntgomes/projects/1) for specific issues we are tracking. 
+Need some ideas on what to contribute? Visit our [project roadmap](/docs/project_roadmap.md) to get some ideas or jump on over to our [development project board](https://github.com/users/SiddarthR56/projects/1) for specific issues we are tracking. 
 
 This project is made possible by the incredible donation of time from NC State Project Contributors and the advice/support of CSC 510 teaching staff. NC State University has made the resources for this project possible, and will continue to support CSC 510 projects for the forseeable future. 
 
