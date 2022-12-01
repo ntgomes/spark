@@ -7,7 +7,7 @@
 [![Build](https://github.com/ntgomes/spark/actions/workflows/build.yml/badge.svg)](https://github.com/ntgomes/spark/actions/workflows/build.yml)
 [![Lint](https://github.com/ntgomes/spark/actions/workflows/lint.yml/badge.svg)](https://github.com/ntgomes/spark/actions/workflows/lint.yml)
 [![Test](https://github.com/ntgomes/spark/actions/workflows/test.yml/badge.svg)](https://github.com/ntgomes/spark/actions/workflows/test.yml)
-![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/ntgomes/6867c01dee2f4d0f96d052c2b2e74ccf/raw/coverage.json)
+[![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/ntgomes/6867c01dee2f4d0f96d052c2b2e74ccf/raw/coverage.json)](https://github.com/ntgomes/spark/blob/main/docs/results.md#code-coverage)
 [![DOI](https://zenodo.org/badge/540260143.svg)](https://zenodo.org/badge/latestdoi/540260143)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
   
@@ -61,69 +61,19 @@ Setup and installation instructions can be found in the [user-friendly install g
 
 Visit our [results page](/docs/results.md) for more information regarding running our test and code coverage scripts. 
 
+## How Does it Work?
+
+See our [high-level diagrams](/docs/diagrams.md) for visual representations and flows for all how the source files are needed to make Spark work as it does. 
+
 ## Directory Structure 
 
-```
-.
-|   .eslintrc.json
-|   .gitignore
-|   CITATION.cff
-|   CODE_OF_CONDUCT.md
-|   CONTRIBUTING.md
-|   LICENSE
-|   INSTALL.md
-|   README.md
-|   package.json
-|   package-lock.json
-|   server.js 
-|   client.js
-|   hand_gesture.js
-|   webrtcpage.html
-|   
-+---.github
-|   \---workflows
-|           build.yml
-|           test.yml
-|           lint.yml
-|           codeql-analysis.yml
-|   \---ISSUE_TEMPLATE
-|           bug_report.md
-|           feature_request.md
-|      
-+---static
-|   \---css
-|       | style.css
-|
-+---scripts
-|   cov_parser.py
-|   help.py
-|      
-+---docs
-|   |   filetree.txt
-|   |   project_roadmap.md
-|   |   proj1rubric.md
-|   |   proj1rubricComments.pdf
-|   |   troubleshooting_guide.md
-|   |   results.md
-|   |   spark_demo.mp4
-|   \---documentation_photos
-|           *lots of photos listed not shown here*
-|   
-+---out 
-|   |   index.html
-|   \---fonts
-|   \---scripts 
-|   \---styles
-|                    
-\---test
-    |   test.js
-```
+Visit our [file tree structure](/docs/filetree.txt) for more information on how Spark's codebase is structured.
 
 ## Contributing
 
-Are you interested in contributing to this project? Visit [our contribution](CONTRIBUTING.md) documentation. 
+Are you interested in contributing to this project? Visit our [contribution documentation](CONTRIBUTING.md) to learn more. 
   
-Need some ideas on what to contribute? Visit our [project roadmap](/docs/project_roadmap.md) to get some ideas or jump on over to our [development project board](https://github.com/users/ntgomes/projects/1) for specific issues we are tracking. 
+Need some ideas on what to contribute? Visit our [project roadmap](/docs/project_roadmap.md) to get some ideas or jump on over to our [development project board](https://github.com/users/SiddarthR56/projects/1) for specific issues we are tracking. 
 
 This project is made possible by the incredible donation of time from NC State Project Contributors and the advice/support of CSC 510 teaching staff. NC State University has made the resources for this project possible, and will continue to support CSC 510 projects for the forseeable future. 
 
@@ -131,7 +81,7 @@ This project is made possible by the incredible donation of time from NC State P
 
 View some common issues users have identified in our [troubleshooting guide](https://github.com/ntgomes/spark/blob/main/docs/troubleshooting_guide.md). We list tips and tricks for identifying where the issue may be coming from. Issue reports may be linked to this guide if you identify a bug that is a software limitation. 
 
-You can visit our website with full descriptions of our classes and methods by opening ```index.html``` within your file explorer. Included on the website is user profiles of people who should use the software and success stories!
+You can visit our website with full descriptions of our classes and methods by go to our [documentation website](https://ntgomes.github.io/spark/) within your web browser of choice. Included on the website are user profiles of people who should use the software, as well as success stories!
   
 Need more support? Our primary method for addressing bugs and feature requests should be through submitting an issue ticket in the "Issues" tab. If you need additional support, please reach out to our development email develop.nak@gmail.com and a member of the team will be in contact with you shortly. You can also email the development email to asked to be added to our subsriber list for updates regarding the project's development.
 
