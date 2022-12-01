@@ -1,38 +1,58 @@
 .
-|   .coverage
 |   .eslintrc.json
 |   .gitignore
+|   .prettierignore
+|   .prettierrc
 |   CITATION.cff
-|   CODE-OF-CONDUCT.md
+|   CODE_OF_CONDUCT.md
 |   CONTRIBUTING.md
-|   LICENSE
 |   INSTALL.md
-|   README.md
-|   package.json
+|   JSDOC_HOME.md
+|   jsdoc.json
+|   LICENSE
 |   package-lock.json
+|   package.json
+|   README.md
+|   server.js
 |   
 +---.github
 |   \---workflows
 |           build.yml
-|           test.yml
+|           codeql-analysis.yml
+|           jsdoc.yml
 |           lint.yml
+|           test.yml
 |   \---ISSUE_TEMPLATE
 |           bug_report.md
 |           feature_request.md
-|     
-+---code
-|   |   server.js 
-|   |   client.js 
-|   |   webrtcpage.html
-|   |   
-+---static
-|   \---css
-|       | style.css
+|      
++---public
+|   |   hand_gesture.js
+|   |   script.js
+|   |   style.css
+|
++---views
+|   |   room.ejs
+|
++---scripts
+|   |   cov_parser.js
+|   |   help.js
 |      
 +---docs
+|   |   blackBoxTests.pdf
+|   |   diagrams.md
+|   |   dependencies.md
+|   |   filetree.txt
+|   |   proj1rubric.md
+|   |   proj1rubricComments.pdf
+|   |   proj2rubric.md
+|   |   project_roadmap.md
+|   |   results.md
+|   |   spark_demo.mp4
+|   |   troubleshooting_guide.md
 |   \---documentation_photos
-|       | frontend_intro.jpg
-|       | project_name.jpg
-|                   
-\---test
+|           *lots of photos listed not shown here*
+|                    
++---test
+    |   gestureTestData
     |   test.js
