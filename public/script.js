@@ -69,6 +69,9 @@ const myVideo = document.createElement('video');
 
 // Mute video by default
 myVideo.muted = true;
+var isBreakout = false;
+var connectedUsers = [];
+
 /**
  * Container for all connected peers in the room.
  *
@@ -178,7 +181,7 @@ navigator.mediaDevices
       // However, the above event listener won't work if there were other peers
       // that joined before it. So we need to include the remaining logic from
       // connectToNewUser() function to ensure the peers object is kept up
-      // to date across everyone in the same room 
+      // to date across everyone in the same room
       call.on('close', () => {
         videoGrid.removeChild(video);
         video.remove();
@@ -192,8 +195,11 @@ navigator.mediaDevices
      * @event socket#on
      */
     socket.on('user-connected', (userId) => {
+      // if (!connectedUsers.includes(userId)) {
       console.log('user Joined');
       connectToNewUser(userId, stream);
+      // connectedUsers.push(userId);
+      // }
     });
 
     /**
@@ -239,6 +245,52 @@ navigator.mediaDevices
     socket.on('muteAll', () => {
       myVideoStream.getAudioTracks()[0].enabled = false;
       setUnmuteButton();
+    });
+
+    socket.on('joinBreakOutRoom', (participantBreakOutRoomMap, roomHostsMap) => {
+      for (let eachUserId in peers) {
+        console.log('removing peers');
+        peers[eachUserId].close();
+      }
+      if (roomHostsMap[ROOM_ID] != userId) {
+        console.log('trying to join room:', participantBreakOutRoomMap[userId]);
+        const toRoom = participantBreakOutRoomMap[userId];
+        socket.emit('join-room', toRoom, userId);
+      } else {
+        for (let eachUserId in peers) {
+          console.log('removing peers');
+          peers[eachUserId].close();
+        }
+      }
+    });
+
+    socket.on('exitBreakRoom', (roomId, roomMapings) => {
+      console.log('mps:', roomMapings);
+      [roomHostsMap, roomParticipantsMap] = roomMapings;
+      for (let eachUserId in peers) {
+        console.log('removing peers');
+        peers[eachUserId].close();
+      }
+      console.log('');
+      if (roomHostsMap[toRoom] != userId) {
+        for (let i = 0; i < videoGrid.children.length; i++) {
+          videoGrid.removeChild(videoGrid.childNodes[i]);
+        }
+        console.log('joining back room: ', toRoom);
+
+        // socket.emit('join-room', toRoom, userId);
+        connectToNewUser(roomHostsMap[toRoom], stream);
+        console.log('mroomParticipantsMap:', roomParticipantsMap);
+        toConnectPeers = roomParticipantsMap[toRoom];
+        console.log('to connect peers', roomParticipantsMap[toRoom]);
+        for (let eachUserId in toConnectPeers) {
+          if (toConnectPeers[eachUserId] != userId) {
+            console.log('cnt:', toConnectPeers[eachUserId]);
+            connectToNewUser(toConnectPeers[eachUserId], stream);
+          }
+        }
+        console.log('peers', peers);
+      }
     });
   });
 
@@ -407,6 +459,28 @@ const setUnmuteButton = () => {
 };
 
 /**
+ * Utilizes DOM manipulation to display the ExitBreakout button
+ * on the breakoutRoom/exitBreakout button container.
+ *
+ * @function
+ */
+const setExitBreakoutRoom = () => {
+  const html = `
+  <i class="exitBreakoutRoom fa fa-window-close"></i>
+  <span>Exit Breakout Rooms</span>
+  `;
+  document.querySelector('.main__breakoutrooms__button').innerHTML = html;
+};
+
+const setBreakoutRoom = () => {
+  const html = `
+  <i class="fa fa-arrows"></i>
+  <span>Breakout Rooms</span>
+  `;
+  document.querySelector('.main__breakoutrooms__button').innerHTML = html;
+};
+
+/**
  * Utilizes DOM manipulation to display the stop video button
  * on the video show/stop button container.
  *
@@ -476,6 +550,20 @@ const muteUnmute = () => {
   } else {
     setMuteButton();
     myVideoStream.getAudioTracks()[0].enabled = true;
+  }
+};
+
+const breakoutUnbreakout = (userId, ROOM_ID, numRooms) => {
+  if (isBreakout) {
+    console.log('trying to exit breakoutrooms');
+    setBreakoutRoom();
+    socket.emit('exitBreakoutRooms', userId, ROOM_ID);
+    isBreakout = false;
+  } else {
+    console.log('creating breakout rooms');
+    socket.emit('createBreakoutRooms', userId, ROOM_ID, numRooms);
+    setExitBreakoutRoom();
+    isBreakout = true;
   }
 };
 
@@ -604,6 +692,12 @@ document.getElementById('muteAll').addEventListener('click', () => {
 document.getElementById('gestureButton').addEventListener('click', () => {
   console.log('gesture click');
   toggleGesture();
+});
+
+document.getElementById('breakoutrooms').addEventListener('click', () => {
+  numRooms = document.getElementById('numRooms').value;
+  console.log('Number of rooms:', numRooms);
+  breakoutUnbreakout(userId, ROOM_ID, numRooms);
 });
 
 var screenShare = document.getElementById('share-screen');

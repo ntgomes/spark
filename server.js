@@ -148,6 +148,10 @@ var roomHostsMap = {};
  */
 var roomParticipantsMap = {};
 
+var participantBreakOutRoomMap = {};
+
+var breakOutRoomsMap = {};
+
 /**
  * Sets various configs for the express app; in the context of Spark, it's only used to set
  * the view engine from HTML to EJS files.
@@ -253,11 +257,12 @@ io.on('connection', (socket) => {
        * defined in the tests.
        */
 
+      if (!roomParticipantsMap[roomId]) {
+        roomParticipantsMap[roomId] = [];
+      }
+
       // Make the socket join a channel under roomId that the io server will broadcast messages to
       socket.join(roomId);
-
-      // Add anyone who joins the room to the roomParticipantsMap
-      roomParticipantsMap[roomId].push(userId);
 
       // First person to join the room is assumed to be the host
       if (roomHostsMap[roomId] === null) {
@@ -265,6 +270,9 @@ io.on('connection', (socket) => {
       }
       // Broadcast to all existing clients in the room that a user has connected
       socket.to(roomId).emit('user-connected', userId);
+
+      // Add anyone who joins the room to the roomParticipantsMap
+      roomParticipantsMap[roomId].push(userId);
 
       /**
        * Handles when a client socket sends a message signal.
@@ -301,6 +309,40 @@ io.on('connection', (socket) => {
           io.to(roomId).emit('muteAll', userId);
         }
       });
+
+      socket.on('createBreakoutRooms', (userId, roomId, numRooms) => {
+        if (roomHostsMap[roomId].includes(userId)) {
+          var newRoomIds = Array(numRooms);
+
+          for (let i = 0; i < numRooms; i++) {
+            newRoomIds[i] = `${uuidV4()}`;
+          }
+          participantBreakOutRoomMap = allocateParticipantsToRooms(
+            roomHostsMap,
+            roomParticipantsMap,
+            roomId,
+            numRooms,
+            newRoomIds
+          );
+
+          console.log(participantBreakOutRoomMap);
+          io.to(roomId).emit('joinBreakOutRoom', participantBreakOutRoomMap, roomHostsMap);
+        }
+      });
+
+      socket.on('exitBreakoutRooms', (userId, roomId) => {
+        // disconnect user
+        if (roomHostsMap[roomId].includes(userId)) {
+          console.log('maps', roomParticipantsMap);
+          const maps = [roomHostsMap, roomParticipantsMap];
+          io.to(roomId).emit('exitBreakRoom', roomId, maps);
+          // delete
+          for (let eachUserId in participantBreakOutRoomMap) {
+            delete participantBreakOutRoomMap[eachUserId];
+          }
+        }
+      });
+
       /**
        * Handles when a client socket sends a disconnect signal.
        *
@@ -308,7 +350,6 @@ io.on('connection', (socket) => {
        * @param {function} [callback] Function that acts on a connecting socket that is called when hit
        * @listens socket#emit
        */
-
       socket.on('disconnect', () => {
         socket.to(roomId).emit('user-disconnected', userId);
 
@@ -316,11 +357,24 @@ io.on('connection', (socket) => {
         const index = roomParticipantsMap[roomId].indexOf(userId);
         roomParticipantsMap[roomId].splice(index, 1);
 
-        // if the user is host, then assign a random person in the participants as the host
-        if (roomParticipantsMap[roomId].length > 0 && roomHostsMap[roomId].includes(userId)) {
-          const randomElement =
-            roomParticipantsMap[roomId][Math.floor(Math.random() * roomParticipantsMap[roomId].length)];
-          roomHostsMap[roomId] = randomElement;
+        // check if the user is exiting a break out room
+        if (participantBreakOutRoomMap[userId]) {
+          delete participantBreakOutRoomMap[userId];
+        }
+        // when a user is not in any breakout room
+        else {
+          // remove participant from the room's map
+          const index = roomParticipantsMap[roomId].indexOf(userId);
+          roomParticipantsMap[roomId].splice(index, 1);
+
+          if (roomHostsMap[roomId]) {
+            // if the user is host, then assign a random person in the participants as the host
+            if (roomParticipantsMap[roomId].length > 0 && roomHostsMap[roomId].includes(userId)) {
+              const randomElement =
+                roomParticipantsMap[roomId][Math.floor(Math.random() * roomParticipantsMap[roomId].length)];
+              roomHostsMap[roomId] = randomElement;
+            }
+          }
         }
       });
     }
@@ -346,3 +400,54 @@ peerServer.listen(process.env.PEER_PORT || 3001);
 
 /* Needed for testing purposes */
 module.exports = { app, io };
+
+function allocateParticipantsToRooms(roomHostsMap, roomParticipantsMap, currentRoom, numRooms, newRoomIds) {
+  var participantBreakOutRoomMap = {};
+  const host_index = roomParticipantsMap[currentRoom].indexOf(roomHostsMap[currentRoom]);
+  roomParticipantsMap[currentRoom].splice(host_index, 1);
+
+  var numParticipantsEach = roomParticipantsMap[currentRoom].length / numRooms;
+  var numPartitipantsInEachRoom = [];
+
+  numPartitipantsInEachRoom = Array(numRooms).fill(0);
+  var numLoop = numRooms;
+
+  if (roomParticipantsMap[currentRoom].length % numRooms != 0) {
+    console.log('h1');
+    while (numLoop != -1) {
+      var pos = numLoop % numRooms;
+      numPartitipantsInEachRoom[pos] += 1;
+      numLoop -= 1;
+    }
+  } else {
+    numPartitipantsInEachRoom = Array(numRooms).fill(numParticipantsEach);
+  }
+
+  const shuffledParticipants = shuffle(roomParticipantsMap[currentRoom]);
+
+  var currIndex = 0;
+  for (let i = 0; i < numRooms; i++) {
+    for (let j = 0; j < numPartitipantsInEachRoom[i]; j++) {
+      participantBreakOutRoomMap[shuffledParticipants[currIndex]] = newRoomIds[i];
+      currIndex += 1;
+    }
+  }
+
+  return participantBreakOutRoomMap;
+}
+function shuffle(array) {
+  let currentIndex = array.length,
+    randomIndex;
+
+  // While there remain elements to shuffle.
+  while (currentIndex != 0) {
+    // Pick a remaining element.
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+}
