@@ -169,12 +169,21 @@ navigator.mediaDevices
       currentPeer = call;
       // Create the new video HTML element for the peer
       const video = document.createElement('video');
-      // When the connecting peer recieves the answer from other peers
-      // tell them to add to their video element to the grid. Effectively
+      // When the newly connecting peer recieves the answer from other peers,
+      // tell it to add to their video element to the grid. Effectively
       // makes it work for >2 peers
       call.on('stream', (userVideoStream) => {
         addVideoStream(video, userVideoStream);
       });
+      // However, the above event listener won't work if there were other peers
+      // that joined before it. So we need to include the remaining logic from
+      // connectToNewUser() function to ensure the peers object is kept up
+      // to date across everyone in the same room 
+      call.on('close', () => {
+        videoGrid.removeChild(video);
+        video.remove();
+      });
+      peers[call['peer']] = call;
     });
 
     /**
@@ -239,6 +248,7 @@ navigator.mediaDevices
  * @event socket#on
  */
 socket.on('user-disconnected', (userId) => {
+  console.log('disconnection of user: ' + userId);
   if (peers[userId]) peers[userId].close();
 });
 
@@ -263,7 +273,6 @@ function connectToNewUser(userId, stream) {
     videoGrid.removeChild(video);
     video.remove();
   });
-
   peers[userId] = call;
 }
 
@@ -477,7 +486,6 @@ const muteUnmute = () => {
  * @function
  */
 const playStop = () => {
-  console.log('object');
   let enabled = myVideoStream.getVideoTracks()[0].enabled;
   if (enabled) {
     myVideoStream.getVideoTracks()[0].enabled = false;
