@@ -482,15 +482,20 @@ const muteUnmute = () => {
 /**
  * Toggles the show and hide of the video stream, along with setting
  * the show and hide video buttons by calling their defined functions.
+ * It does this by using the myVideo pause() and play() functions from
+ * HTMLVideoElement to manipulate video state.
  *
  * @function
  */
 const playStop = () => {
   let enabled = myVideoStream.getVideoTracks()[0].enabled;
   if (enabled) {
+    myVideo.pause();
+    myVideo.currentTime = 0;
     myVideoStream.getVideoTracks()[0].enabled = false;
     setPlayVideo();
   } else {
+    myVideo.play();
     setStopVideo();
     myVideoStream.getVideoTracks()[0].enabled = true;
   }
