@@ -287,9 +287,6 @@ navigator.mediaDevices
 
       // when user is not the host
       if (roomHostsMap[toRoom] != userId) {
-        // for (let i = 0; i < videoGrid.children.length; i++) {
-        //   videoGrid.removeChild(videoGrid.childNodes[i]);
-        // }
         console.log('joining back room: ', toRoom);
 
         // connect back to host
