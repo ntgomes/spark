@@ -208,7 +208,7 @@ navigator.mediaDevices
     });
 
     // input value fetched by jQuery
-    let text = $('input');
+    let text = $('#chat_message');
     // When a key is pressed when sending a non-empty chat message
     $('html').keydown(function (e) {
       console.log(text.val());
