@@ -147,6 +147,12 @@ var roomHostsMap = {};
  * @type {Object}
  */
 var roomParticipantsMap = {};
+/**
+ * Variable to keep track of breakout rooms for determining where to place participants.
+ *
+ * @type {Object}
+ */
+var participantBreakOutRoomMap = {};
 
 /**
  * Sets various configs for the express app; in the context of Spark, it's only used to set
@@ -253,11 +259,13 @@ io.on('connection', (socket) => {
        * defined in the tests.
        */
 
+      // initialize roomParticipants for a room
+      if (!roomParticipantsMap[roomId]) {
+        roomParticipantsMap[roomId] = [];
+      }
+
       // Make the socket join a channel under roomId that the io server will broadcast messages to
       socket.join(roomId);
-
-      // Add anyone who joins the room to the roomParticipantsMap
-      roomParticipantsMap[roomId].push(userId);
 
       // First person to join the room is assumed to be the host
       if (roomHostsMap[roomId] === null) {
@@ -265,6 +273,9 @@ io.on('connection', (socket) => {
       }
       // Broadcast to all existing clients in the room that a user has connected
       socket.to(roomId).emit('user-connected', userId);
+
+      // Add anyone who joins the room to the roomParticipantsMap
+      roomParticipantsMap[roomId].push(userId);
 
       /**
        * Handles when a client socket sends a message signal.
@@ -301,6 +312,114 @@ io.on('connection', (socket) => {
           io.to(roomId).emit('muteAll', userId);
         }
       });
+
+      /**
+       * Handles when a host socket sends a breakout-room signal.
+       *
+       * @param {string} [label] Label of the signal that io picks up
+       * @param {function} [callback] Function that acts on a connecting socket that is called when hit
+       * @listens socket#emit
+       */
+      socket.on('createBreakoutRooms', (userId, roomId, numRooms) => {
+        // send peers into breakout rooms created by the host
+        if (roomHostsMap[roomId].includes(userId)) {
+          var newRoomIds = Array(numRooms);
+
+          // create new room ids to send people
+          for (let i = 0; i < numRooms; i++) {
+            newRoomIds[i] = `${uuidV4()}`;
+          }
+
+          // function call to create a map of which participant goes to which room
+          participantBreakOutRoomMap = (function (
+            roomHostsMap,
+            roomParticipantsMap,
+            currentRoom,
+            numRooms,
+            newRoomIds
+          ) {
+            var participantBreakOutRoomMap = {};
+
+            // get host and remove host from participants
+            const host_index = roomParticipantsMap[currentRoom].indexOf(roomHostsMap[currentRoom]);
+            roomParticipantsMap[currentRoom].splice(host_index, 1);
+
+            // get how many partcipants should usually be allocated
+            var numParticipantsEach = roomParticipantsMap[currentRoom].length / numRooms;
+
+            // initialize variables
+            var numPartitipantsInEachRoom = [];
+            numPartitipantsInEachRoom = Array(numRooms).fill(0);
+            var numLoop = numRooms;
+
+            // when number of peers in room is divisble by the number of rooms to create
+            if (roomParticipantsMap[currentRoom].length % numRooms != 0) {
+              while (numLoop != -1) {
+                var pos = numLoop % numRooms;
+                numPartitipantsInEachRoom[pos] += 1;
+                numLoop -= 1;
+              }
+            } else {
+              numPartitipantsInEachRoom = Array(numRooms).fill(numParticipantsEach);
+            }
+
+            // randomize the array to allocate peers randomly
+            const shuffledParticipants = (function (array) {
+              let currentIndex = array.length,
+                randomIndex;
+
+              // While there remain elements to shuffle.
+              while (currentIndex != 0) {
+                // Pick a remaining element.
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+
+                // And swap it with the current element.
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+              }
+
+              return array;
+            })(roomParticipantsMap[currentRoom]);
+
+            // create a map of userId: newRoom
+            var currIndex = 0;
+            for (let i = 0; i < numRooms; i++) {
+              for (let j = 0; j < numPartitipantsInEachRoom[i]; j++) {
+                participantBreakOutRoomMap[shuffledParticipants[currIndex]] = newRoomIds[i];
+                currIndex += 1;
+              }
+            }
+
+            return participantBreakOutRoomMap;
+          })(roomHostsMap, roomParticipantsMap, roomId, numRooms, newRoomIds);
+
+          // broadcast to the peers in the room to join breakout room
+          io.to(roomId).emit('joinBreakOutRoom', participantBreakOutRoomMap, roomHostsMap);
+        }
+      });
+
+      /**
+       * Handles when a host socket sends an exit breakout-room signal.
+       *
+       * @param {string} [label] Label of the signal that io picks up
+       * @param {function} [callback] Function that acts on a connecting socket that is called when hit
+       * @listens socket#emit
+       */
+      socket.on('exitBreakoutRooms', (userId, roomId) => {
+        // disconnect users from their rooms
+        if (roomHostsMap[roomId].includes(userId)) {
+          const maps = [roomHostsMap, roomParticipantsMap];
+
+          // broadcast peers to exit the room
+          io.to(roomId).emit('exitBreakRoom', roomId, maps);
+
+          // delete entries in breakout room map
+          for (let eachUserId in participantBreakOutRoomMap) {
+            delete participantBreakOutRoomMap[eachUserId];
+          }
+        }
+      });
+
       /**
        * Handles when a client socket sends a disconnect signal.
        *
@@ -308,7 +427,6 @@ io.on('connection', (socket) => {
        * @param {function} [callback] Function that acts on a connecting socket that is called when hit
        * @listens socket#emit
        */
-
       socket.on('disconnect', () => {
         socket.to(roomId).emit('user-disconnected', userId);
 
@@ -316,11 +434,24 @@ io.on('connection', (socket) => {
         const index = roomParticipantsMap[roomId].indexOf(userId);
         roomParticipantsMap[roomId].splice(index, 1);
 
-        // if the user is host, then assign a random person in the participants as the host
-        if (roomParticipantsMap[roomId].length > 0 && roomHostsMap[roomId].includes(userId)) {
-          const randomElement =
-            roomParticipantsMap[roomId][Math.floor(Math.random() * roomParticipantsMap[roomId].length)];
-          roomHostsMap[roomId] = randomElement;
+        // check if the user is exiting a break out room
+        if (participantBreakOutRoomMap[userId]) {
+          delete participantBreakOutRoomMap[userId];
+        }
+        // when a user is not in any breakout room
+        else {
+          // remove participant from the room's map
+          const index = roomParticipantsMap[roomId].indexOf(userId);
+          roomParticipantsMap[roomId].splice(index, 1);
+
+          if (roomHostsMap[roomId]) {
+            // if the user is host, then assign a random person in the participants as the host
+            if (roomParticipantsMap[roomId].length > 0 && roomHostsMap[roomId].includes(userId)) {
+              const randomElement =
+                roomParticipantsMap[roomId][Math.floor(Math.random() * roomParticipantsMap[roomId].length)];
+              roomHostsMap[roomId] = randomElement;
+            }
+          }
         }
       });
     }

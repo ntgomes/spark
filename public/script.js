@@ -33,12 +33,12 @@
  * @fires socket#emit
  */
 const socket = io.connect('/');
+
 /**
  * The grid of local and remote video objects representing the video of all peers.
  *
  * @const
  */
-
 const videoGrid = document.getElementById('video-grid');
 
 /**
@@ -57,7 +57,6 @@ var myPeer = null;
  *
  * @type {Object}
  */
-
 let myVideoStream;
 
 /**
@@ -69,6 +68,14 @@ const myVideo = document.createElement('video');
 
 // Mute video by default
 myVideo.muted = true;
+
+/**
+ * Boolean for toggling whether or not the user is in a breakout room. Default false.
+ *
+ * @type {boolean}
+ */
+var isBreakout = false;
+
 /**
  * Container for all connected peers in the room.
  *
@@ -178,7 +185,7 @@ navigator.mediaDevices
       // However, the above event listener won't work if there were other peers
       // that joined before it. So we need to include the remaining logic from
       // connectToNewUser() function to ensure the peers object is kept up
-      // to date across everyone in the same room 
+      // to date across everyone in the same room
       call.on('close', () => {
         videoGrid.removeChild(video);
         video.remove();
@@ -239,6 +246,66 @@ navigator.mediaDevices
     socket.on('muteAll', () => {
       myVideoStream.getAudioTracks()[0].enabled = false;
       setUnmuteButton();
+    });
+
+    /**
+     * Handles what happens when it recieves 'joinBreakoutRoom' from the server.
+     * Effectively just runs the joining of breakout rooms code.
+     *
+     * @event socket#on
+     */
+    socket.on('joinBreakOutRoom', (participantBreakOutRoomMap, roomHostsMap) => {
+      // close calls all peers in the room
+      for (let eachUserId in peers) {
+        console.log('removing peers');
+        peers[eachUserId].close();
+      }
+
+      // when user is not the host, join the newly created room
+      if (roomHostsMap[ROOM_ID] != userId) {
+        console.log('trying to join room:', participantBreakOutRoomMap[userId]);
+        const toRoom = participantBreakOutRoomMap[userId];
+        socket.emit('join-room', toRoom, userId);
+      }
+    });
+
+    /**
+     * Handles what happens when it recieves 'exitBreakRoom' from the server.
+     * Effectively just runs the exiting of breakout rooms code.
+     *
+     * @event socket#on
+     */
+    socket.on('exitBreakRoom', (toRoom, roomMapings) => {
+      console.log('mps:', roomMapings);
+
+      // unpack the mappings
+      [roomHostsMap, roomParticipantsMap] = roomMapings;
+
+      // remove current peers
+      for (let eachUserId in peers) {
+        console.log('removing peers');
+        peers[eachUserId].close();
+      }
+
+      // when user is not the host
+      if (roomHostsMap[toRoom] != userId) {
+        console.log('joining back room: ', toRoom);
+
+        // connect back to host
+        connectToNewUser(roomHostsMap[toRoom], stream);
+        console.log('mroomParticipantsMap:', roomParticipantsMap);
+
+        // call other users that are going to be in the room
+        toConnectPeers = roomParticipantsMap[toRoom];
+        console.log('to connect peers', roomParticipantsMap[toRoom]);
+        for (let eachUserId in toConnectPeers) {
+          if (toConnectPeers[eachUserId] != userId) {
+            console.log('cnt:', toConnectPeers[eachUserId]);
+            connectToNewUser(toConnectPeers[eachUserId], stream);
+          }
+        }
+        console.log('peers', peers);
+      }
     });
   });
 
@@ -407,6 +474,28 @@ const setUnmuteButton = () => {
 };
 
 /**
+ * Utilizes DOM manipulation to display the ExitBreakout button
+ * on the breakoutRoom/exitBreakout button container.
+ *
+ * @function
+ */
+const setExitBreakoutRoom = () => {
+  const html = `
+  <i class="exitBreakoutRoom fa fa-window-close"></i>
+  <span>Exit Breakout Rooms</span>
+  `;
+  document.querySelector('.main__breakoutrooms__button').innerHTML = html;
+};
+
+const setBreakoutRoom = () => {
+  const html = `
+  <i class="fa fa-arrows"></i>
+  <span>Breakout Rooms</span>
+  `;
+  document.querySelector('.main__breakoutrooms__button').innerHTML = html;
+};
+
+/**
  * Utilizes DOM manipulation to display the stop video button
  * on the video show/stop button container.
  *
@@ -476,6 +565,26 @@ const muteUnmute = () => {
   } else {
     setMuteButton();
     myVideoStream.getAudioTracks()[0].enabled = true;
+  }
+};
+
+/**
+ * Toggles the brekoutRoom and exitBreakoutRoom for the user, along with setting
+ * the Breakout Rooms and Exit Breakout button by calling their defined functions.
+ *
+ * @function
+ */
+const breakoutUnbreakout = (userId, ROOM_ID, numRooms) => {
+  if (isBreakout) {
+    console.log('trying to exit breakoutrooms');
+    setBreakoutRoom();
+    socket.emit('exitBreakoutRooms', userId, ROOM_ID);
+    isBreakout = false;
+  } else {
+    console.log('creating breakout rooms');
+    socket.emit('createBreakoutRooms', userId, ROOM_ID, numRooms);
+    setExitBreakoutRoom();
+    isBreakout = true;
   }
 };
 
@@ -604,6 +713,12 @@ document.getElementById('muteAll').addEventListener('click', () => {
 document.getElementById('gestureButton').addEventListener('click', () => {
   console.log('gesture click');
   toggleGesture();
+});
+
+document.getElementById('breakoutrooms').addEventListener('click', () => {
+  numRooms = document.getElementById('numRooms').value;
+  console.log('Number of rooms:', numRooms);
+  breakoutUnbreakout(userId, ROOM_ID, numRooms);
 });
 
 var screenShare = document.getElementById('share-screen');
