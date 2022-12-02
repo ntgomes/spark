@@ -35,6 +35,9 @@
          object-fit: cover;
          padding: 8px;
       }
+      #numRooms{
+         width: 50px;
+      }
    </style>
 </head>
 <body>
@@ -79,7 +82,18 @@
                   <input type="file" style="display:none;" id="filetransfer" name="File Transfer"/>                
                </div>
             </div>
+            
+            
             <div class="main__controls__block">
+               <div>
+                  <form>
+                     <label for="numRooms">Enter Num Rooms: </label>
+                     <input
+                       id="numRooms"
+                       type="number"
+                       value=1 />
+                  </form>
+               </div>
                <div class="main__controls__button">
 
                   <div id="breakoutrooms" class="main__controls__button main__breakoutrooms__button">
@@ -95,9 +109,7 @@
          </div>
          <div class="main__chat_window">
             <ul class="messages">
-               
             </ul>
-
          </div>
          <div class="main__message_container">
             <input id="chat_message" type="text" placeholder="Type message here...">
