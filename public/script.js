@@ -33,12 +33,12 @@
  * @fires socket#emit
  */
 const socket = io.connect('/');
+
 /**
  * The grid of local and remote video objects representing the video of all peers.
  *
  * @const
  */
-
 const videoGrid = document.getElementById('video-grid');
 
 /**
@@ -57,7 +57,6 @@ var myPeer = null;
  *
  * @type {Object}
  */
-
 let myVideoStream;
 
 /**
@@ -70,9 +69,12 @@ const myVideo = document.createElement('video');
 // Mute video by default
 myVideo.muted = true;
 
-// Breaoutroom set to false
+/**
+ * Boolean for toggling whether or not the user is in a breakout room. Default false.
+ *
+ * @type {boolean}
+ */
 var isBreakout = false;
-var connectedUsers = [];
 
 /**
  * Container for all connected peers in the room.
