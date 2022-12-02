@@ -264,7 +264,7 @@ navigator.mediaDevices
       }
     });
 
-    socket.on('exitBreakRoom', (roomId, roomMapings) => {
+    socket.on('exitBreakRoom', (toRoom, roomMapings) => {
       console.log('mps:', roomMapings);
       [roomHostsMap, roomParticipantsMap] = roomMapings;
       for (let eachUserId in peers) {
