@@ -50,12 +50,7 @@ const videoGrid = document.getElementById('video-grid');
  * @param {Object} [options] Options for setting up the peer connection; required
  * @listens myPeer#on
  */
-const myPeer = new Peer(undefined, {
-  config: { iceServers: [{ url: 'stun:stun.l.google.com:19302' }] },
-  path: '/peerjs', // Points to server.js /peerjs endpoint
-  host: '/', // This means it points to localhost
-  port: '3001', // Points to {host}:3001
-});
+var myPeer = null;
 
 /**
  * Reference to the local video stream for the client.
@@ -155,6 +150,13 @@ navigator.mediaDevices
      */
     camera.start();
 
+    myPeer = new Peer(undefined, {
+      config: { iceServers: [{ url: 'stun:stun.l.google.com:19302' }] },
+      path: '/peerjs', // Points to server.js /peerjs endpoint
+      host: '/', // This means it points to localhost
+      port: '3001', // Points to {host}:3001
+    });
+
     /**
      * Handles what happens when a new peer uses call().
      *
@@ -184,6 +186,18 @@ navigator.mediaDevices
       console.log('user Joined');
       connectToNewUser(userId, stream);
     });
+
+    /**
+     * Handles what happens when a new peer connects.
+     *
+     * @event myPeer#on
+     */
+    myPeer.on('open', (id) => {
+      console.log('Opened');
+      userId = id; // Sets the userId with the peer's unique internal ID
+      socket.emit('join-room', ROOM_ID, id);
+    });
+
     // input value fetched by jQuery
     let text = $('input');
     // When a key is pressed when sending a non-empty chat message
@@ -226,17 +240,6 @@ navigator.mediaDevices
  */
 socket.on('user-disconnected', (userId) => {
   if (peers[userId]) peers[userId].close();
-});
-
-/**
- * Handles what happens when a new peer connects.
- *
- * @event myPeer#on
- */
-myPeer.on('open', (id) => {
-  console.log('Opened');
-  userId = id; // Sets the userId with the peer's unique internal ID
-  socket.emit('join-room', ROOM_ID, id);
 });
 
 /**
