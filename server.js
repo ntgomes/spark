@@ -257,6 +257,7 @@ io.on('connection', (socket) => {
        * defined in the tests.
        */
 
+      // initialize roomParticipants for a room
       if (!roomParticipantsMap[roomId]) {
         roomParticipantsMap[roomId] = [];
       }
@@ -310,13 +311,24 @@ io.on('connection', (socket) => {
         }
       });
 
+      /**
+       * Handles when a host socket sends a breakout-room signal.
+       *
+       * @param {string} [label] Label of the signal that io picks up
+       * @param {function} [callback] Function that acts on a connecting socket that is called when hit
+       * @listens socket#emit
+       */
       socket.on('createBreakoutRooms', (userId, roomId, numRooms) => {
+        // send peers into breakout rooms created by the host
         if (roomHostsMap[roomId].includes(userId)) {
           var newRoomIds = Array(numRooms);
 
+          // create new room ids to send people
           for (let i = 0; i < numRooms; i++) {
             newRoomIds[i] = `${uuidV4()}`;
           }
+
+          // function call to create a map of which participant goes to which room
           participantBreakOutRoomMap = allocateParticipantsToRooms(
             roomHostsMap,
             roomParticipantsMap,
@@ -326,17 +338,29 @@ io.on('connection', (socket) => {
           );
 
           console.log(participantBreakOutRoomMap);
+
+          // broadcast to the peers in the room to join breakout room
           io.to(roomId).emit('joinBreakOutRoom', participantBreakOutRoomMap, roomHostsMap);
         }
       });
 
+      /**
+       * Handles when a host socket sends an exit breakout-room signal.
+       *
+       * @param {string} [label] Label of the signal that io picks up
+       * @param {function} [callback] Function that acts on a connecting socket that is called when hit
+       * @listens socket#emit
+       */
       socket.on('exitBreakoutRooms', (userId, roomId) => {
-        // disconnect user
+        // disconnect users from their rooms
         if (roomHostsMap[roomId].includes(userId)) {
           console.log('maps', roomParticipantsMap);
           const maps = [roomHostsMap, roomParticipantsMap];
+
+          // broadcast peers to exit the room
           io.to(roomId).emit('exitBreakRoom', roomId, maps);
-          // delete
+
+          // delete entries in breakout room map
           for (let eachUserId in participantBreakOutRoomMap) {
             delete participantBreakOutRoomMap[eachUserId];
           }
@@ -401,19 +425,24 @@ peerServer.listen(process.env.PEER_PORT || 3001);
 /* Needed for testing purposes */
 module.exports = { app, io };
 
+// function to create a map of new rooms and participants for breakout rooms
 function allocateParticipantsToRooms(roomHostsMap, roomParticipantsMap, currentRoom, numRooms, newRoomIds) {
   var participantBreakOutRoomMap = {};
+
+  // get host and remove host from participants
   const host_index = roomParticipantsMap[currentRoom].indexOf(roomHostsMap[currentRoom]);
   roomParticipantsMap[currentRoom].splice(host_index, 1);
 
+  // get how many partcipants should usually be allocated
   var numParticipantsEach = roomParticipantsMap[currentRoom].length / numRooms;
-  var numPartitipantsInEachRoom = [];
 
+  // initialize variables
+  var numPartitipantsInEachRoom = [];
   numPartitipantsInEachRoom = Array(numRooms).fill(0);
   var numLoop = numRooms;
 
+  // when number of peers in room is divisble by the number of rooms to create
   if (roomParticipantsMap[currentRoom].length % numRooms != 0) {
-    console.log('h1');
     while (numLoop != -1) {
       var pos = numLoop % numRooms;
       numPartitipantsInEachRoom[pos] += 1;
@@ -423,8 +452,10 @@ function allocateParticipantsToRooms(roomHostsMap, roomParticipantsMap, currentR
     numPartitipantsInEachRoom = Array(numRooms).fill(numParticipantsEach);
   }
 
+  // randomize the array to allocate peers randomly
   const shuffledParticipants = shuffle(roomParticipantsMap[currentRoom]);
 
+  // create a map of userId: newRoom
   var currIndex = 0;
   for (let i = 0; i < numRooms; i++) {
     for (let j = 0; j < numPartitipantsInEachRoom[i]; j++) {
@@ -435,6 +466,8 @@ function allocateParticipantsToRooms(roomHostsMap, roomParticipantsMap, currentR
 
   return participantBreakOutRoomMap;
 }
+
+// shuffles the entries of an array
 function shuffle(array) {
   let currentIndex = array.length,
     randomIndex;
