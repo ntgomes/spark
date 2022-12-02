@@ -50,12 +50,7 @@ const videoGrid = document.getElementById('video-grid');
  * @param {Object} [options] Options for setting up the peer connection; required
  * @listens myPeer#on
  */
-const myPeer = new Peer(undefined, {
-  config: { iceServers: [{ url: 'stun:stun.l.google.com:19302' }] },
-  path: '/peerjs', // Points to server.js /peerjs endpoint
-  host: '/', // This means it points to localhost
-  port: '3001', // Points to {host}:3001
-});
+var myPeer = null;
 
 /**
  * Reference to the local video stream for the client.
@@ -155,6 +150,13 @@ navigator.mediaDevices
      */
     camera.start();
 
+    myPeer = new Peer(undefined, {
+      config: { iceServers: [{ url: 'stun:stun.l.google.com:19302' }] },
+      path: '/peerjs', // Points to server.js /peerjs endpoint
+      host: '/', // This means it points to localhost
+      port: '3001', // Points to {host}:3001
+    });
+
     /**
      * Handles what happens when a new peer uses call().
      *
@@ -167,12 +169,21 @@ navigator.mediaDevices
       currentPeer = call;
       // Create the new video HTML element for the peer
       const video = document.createElement('video');
-      // When the connecting peer recieves the answer from other peers
-      // tell them to add to their video element to the grid. Effectively
+      // When the newly connecting peer recieves the answer from other peers,
+      // tell it to add to their video element to the grid. Effectively
       // makes it work for >2 peers
       call.on('stream', (userVideoStream) => {
         addVideoStream(video, userVideoStream);
       });
+      // However, the above event listener won't work if there were other peers
+      // that joined before it. So we need to include the remaining logic from
+      // connectToNewUser() function to ensure the peers object is kept up
+      // to date across everyone in the same room 
+      call.on('close', () => {
+        videoGrid.removeChild(video);
+        video.remove();
+      });
+      peers[call['peer']] = call;
     });
 
     /**
@@ -184,6 +195,18 @@ navigator.mediaDevices
       console.log('user Joined');
       connectToNewUser(userId, stream);
     });
+
+    /**
+     * Handles what happens when a new peer connects.
+     *
+     * @event myPeer#on
+     */
+    myPeer.on('open', (id) => {
+      console.log('Opened');
+      userId = id; // Sets the userId with the peer's unique internal ID
+      socket.emit('join-room', ROOM_ID, id);
+    });
+
     // input value fetched by jQuery
     let text = $('input');
     // When a key is pressed when sending a non-empty chat message
@@ -225,18 +248,8 @@ navigator.mediaDevices
  * @event socket#on
  */
 socket.on('user-disconnected', (userId) => {
+  console.log('disconnection of user: ' + userId);
   if (peers[userId]) peers[userId].close();
-});
-
-/**
- * Handles what happens when a new peer connects.
- *
- * @event myPeer#on
- */
-myPeer.on('open', (id) => {
-  console.log('Opened');
-  userId = id; // Sets the userId with the peer's unique internal ID
-  socket.emit('join-room', ROOM_ID, id);
 });
 
 /**
@@ -260,7 +273,6 @@ function connectToNewUser(userId, stream) {
     videoGrid.removeChild(video);
     video.remove();
   });
-
   peers[userId] = call;
 }
 
@@ -474,7 +486,6 @@ const muteUnmute = () => {
  * @function
  */
 const playStop = () => {
-  console.log('object');
   let enabled = myVideoStream.getVideoTracks()[0].enabled;
   if (enabled) {
     myVideoStream.getVideoTracks()[0].enabled = false;
