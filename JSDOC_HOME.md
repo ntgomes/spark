@@ -23,7 +23,7 @@ Navigate throughout our documentation here to learn about the specific functiona
 <hr>
 <br> 
 <p> 
-  Copyright (C) 2022 Kraft, Royapally, Sarthi, Ramaswamy, Maduru, Harde, Gomes, Bellam, Reddy, Craine, Gupta
+  Copyright (C) 2022 Kraft, Royapally, Sarthi, Ramaswamy, Maduru, Harde, Gomes, Bellam, Gupta, Reddy
 <br>
 All Rights Reserved
 <br>
