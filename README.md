@@ -17,8 +17,15 @@ We have the best hands free solution to your presentation needs! Have you ever p
 
 ## Capabilities 
 
-- Allows two users to join a video conferencing web application
-- Provides capabilities for user to be able to use gestures to manipulate the web conferencing interface.
+- Allows a virtually unlimited number of users to join a room as a video conferencing web application
+- Gives each user camera and microphone controls through buttons that toggle their respective video and audio
+- Allows users in the same room to send share text messages using the chat window section 
+- Lets users share any file from their system by using a file transfer button
+- Allows for anyone to share their screen to others in the same room
+- Distinguishes hosts and non-hosts in a room, with special actions being allowed by the host of the room
+    - Access to a mute all button which mutes everyone in the room
+    - Access to set a number of breakout rooms, and send other room members to those breakout rooms equally 
+- Provides utilities for user to be able to use gestures to manipulate the web conferencing interface
     - Show a thumbs up __to change volume__ 
     - Swipe left or right to interact with your __screen sharing capabilities__. 
 
