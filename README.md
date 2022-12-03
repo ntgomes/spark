@@ -44,21 +44,22 @@ We have the best hands free solution to your presentation needs! Have you ever p
 
 <h1>
 
-## Worked Examples
+## Worked Example
+In this example, we will show two users joining a room in Spark, and the second user sharing their screen using gestures.
 
-1. User is directed to the homepage where they are asked to enter a room number they would like to join. If the room does not already exist, a new room will be created for the user, for example, Room 2 is created in our case here.
-
-<img src="/docs/documentation_photos/ChooseRoomNo.png" alt="drawing" width="480" /> 
-
-2. If another person wishes to join the room, they can simply enter the same room number to join the room. Currently, the application supports volume functions for mute/ unmute, video on/off, and screen share functionality. Gesture recognition is enabled by default for the mute/unmute and screen sharing functionalities.
+1. The user navigates to the base page for the application, where they are redirected to a room with an auto-generated room URL. The user gives permission for the app to access their camera and microphone, and once the app is given permission, the user full joins the room and has access to use all the room controls.
 
 <img src="/docs/documentation_photos/RoomWithOne.png" alt="drawing" width="480" /> 
 
-3. By showing thumbs up/ down action towards the camera, either of the two users will be able to mute/ unmute their microphones. Similarly swipe left/ right action towards the camera will allow the users to share their screens with each other. In addition, users will also be able to disable gesture recognition by clicking the <b>Disable Gestures<b> button.
+2. If another person wishes to join the room, they need only navigate to the same auto-generated room URL from step 1 in their browser. Currently, the application supports volume functions for mute/ unmute, host-controlled mute all, video on/off, gesture toggle, chat utilities, host-controlled breakout rooms, file transfer, and screen share functionality. Gesture recognition is disabled by default for the mute/unmute and screen sharing functionalities.
 
 <img src="/docs/documentation_photos/MeetingWithTwo.png" alt="drawing" width="480" /> 
 
+3. By enabling gestures, showing thumbs up/ down action towards the camera, either of the two users will be able to mute/ unmute their microphones. Similarly swipe left/ right action towards the camera will allow the users to share their screens with each other. Of course, users will also be able to disable gesture recognition by clicking the <b>Disable Gestures</b> button.
+
 <img src="/docs/documentation_photos/ScreenSharing.png" alt="drawing" width="480" /> 
+
+This is just one of the many examples shown for the capabilities of this application. To view more examples, please refer to our comprehensive [black-box test suite](/docs/blackBoxTests.pdf) with screenshots to showcase a particular feature. 
 
 ## Use 
 
