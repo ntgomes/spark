@@ -8,7 +8,7 @@
 [![Lint](https://github.com/ntgomes/spark/actions/workflows/lint.yml/badge.svg)](https://github.com/ntgomes/spark/actions/workflows/lint.yml)
 [![Test](https://github.com/ntgomes/spark/actions/workflows/test.yml/badge.svg)](https://github.com/ntgomes/spark/actions/workflows/test.yml)
 [![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/ntgomes/6867c01dee2f4d0f96d052c2b2e74ccf/raw/coverage.json)](https://github.com/ntgomes/spark/blob/main/docs/results.md#code-coverage)
-[![DOI](https://zenodo.org/badge/540260143.svg)](https://zenodo.org/badge/latestdoi/540260143)
+[![DOI](https://zenodo.org/badge/556983678.svg)](https://zenodo.org/badge/latestdoi/556983678)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
   
 </h3>
