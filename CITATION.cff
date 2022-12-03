@@ -1,7 +1,20 @@
-cff-version: 1.0.0
+cff-version: 1.0.1
 message: "If you use this software, please cite it as below."
 authors:
- - given-names: Neeloy
+  - family-names: "Kraft"
+    given-names: "Natalie"
+    orcid: "https://orcid.org/0000-0002-5919-5653"
+  - family-names: "Royapally"
+    given-names: "Siddarth"
+  - family-names: "Sarthi"
+    given-names: "Parth"
+  - family-names: "Ramaswamy"
+    given-names: "Ashrita"
+  - family-names: "Maduru"
+    given-names: "Jyothi Sumer Goud"
+  - family-names: "Harde" 
+    given-names: "Kanishk"
+  - given-names: Neeloy
     family-names: Gomes
     email: neeloy.gomes@gmail.com
   - given-names: Vishal
@@ -10,14 +23,11 @@ authors:
   - given-names: Abhimanyu
     family-names: Bellam
     email: bellamabhimanyu@gmail.com
-  - given-names: Tyler
-    family-names: Craine
-    email: tylerkecraine@gmail.com
   - given-names: Abhishek
     family-names: Gupta
     email: guptabhishek785@gmail.com
 title: "CSC510 - Spark Gesture Recognition Web Conferencing"
 version: 1.0.0
 doi: 10.5281/zenodo.7392639
-date-released: 2022-10-06
+date-released: 2022-12-05
 url: "https://github.com/ntgomes/spark"
