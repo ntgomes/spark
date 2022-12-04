@@ -38,11 +38,7 @@ We have the best hands free solution to your presentation needs! Have you ever p
 
 ## Demo Video 
 
-<h1 align="center"> 
-
-![Spark Demo](https://user-images.githubusercontent.com/99683342/194715093-3fbc1bc9-7690-4edb-b8bb-5594ba029bb7.mp4) 
-
-<h1>
+https://user-images.githubusercontent.com/45674454/205515543-bbbeb94f-2e7d-445b-a25f-6d2d10b4256f.mp4
 
 ## Worked Example
 In this example, we will show two users joining a room in Spark, and the second user sharing their screen using gestures.
