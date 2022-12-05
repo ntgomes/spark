@@ -40,8 +40,8 @@
 |      
 +---docs
 |   |   blackBoxTests.pdf
-|   |   diagrams.md
 |   |   dependencies.md
+|   |   diagrams.md
 |   |   filetree.txt
 |   |   proj1rubric.md
 |   |   proj1rubricComments.pdf
@@ -49,6 +49,7 @@
 |   |   project_roadmap.md
 |   |   results.md
 |   |   spark_demo.mp4
+|   |   sustainabilityEvaluation.pdf
 |   |   troubleshooting_guide.md
 |   \---documentation_photos
 |           *lots of photos listed not shown here*
